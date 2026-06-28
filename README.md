@@ -11,7 +11,7 @@ Proyek ini diajukan untuk **GWE 2026 Data Science Challenge**.
 * **Nama Tim / Peserta:** Try Dulu Deh
 * **Anggota Tim:** Arneta Alifiana, Laula Fatimatusyifa
 * **Tema yang Dipilih:** Risk Prediction / Sentiment Analysis (Kesehatan)
-* **Link Deployment Streamlit:** [Streamlit Cloud (Placeholder)](#)
+* **Link Deployment Streamlit:** [CekKlaim.id](https://cekklaimm.streamlit.app/)
 * **Model yang Digunakan:** `indobenchmark/indobert-base-p2`
 * **Sumber Dataset:** Dataset Hoaks Kesehatan dari Repository Open Data Publik (TurnBackHoax, MAFINDO, dsb).
 
@@ -27,8 +27,6 @@ Sesuai rekomendasi struktur repositori kompetisi:
 ```text
 ├── README.md
 ├── requirements.txt
-├── Dockerfile
-├── docker-compose.yml
 ├── notebooks/
 │   └── analysis.ipynb        # Notebook lengkap: Preprocessing, EDA, Feature Eng, Modeling, Evaluasi, Kesimpulan
 ├── src/
