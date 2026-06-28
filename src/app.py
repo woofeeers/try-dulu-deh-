@@ -493,8 +493,22 @@ def preprocess_text(text, slang_dict, remove_bias=True):
 @st.cache_resource
 def load_local_model():
     MODEL_PATH = "models/indobert_hoax_model"
-    if not os.path.exists(MODEL_PATH):
-        MODEL_PATH = "model/indobert_hoax_model"
+    model_file = os.path.join(MODEL_PATH, "model.safetensors")
+    
+    # Otomatis download dari Google Drive jika model belum ada
+    if not os.path.exists(model_file):
+        try:
+            import gdown
+            st.info("🔄 Mengunduh model IndoBERT untuk pertama kali (± 497MB). Mohon tunggu sekitar 1-2 menit...")
+            # Menggunakan ID file dari link yang diberikan user
+            file_id = "1B-GZ2VGcQ-neqe5AOB31RFbY4Lzscb3Y"
+            url = f'https://drive.google.com/uc?id={file_id}'
+            os.makedirs(MODEL_PATH, exist_ok=True)
+            gdown.download(url, model_file, quiet=False)
+            st.success("✅ Model berhasil diunduh!")
+        except Exception as e:
+            st.error(f"Gagal mengunduh model: {e}")
+
     try:
         tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
         model = AutoModelForSequenceClassification.from_pretrained(MODEL_PATH)
