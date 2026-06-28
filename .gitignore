@@ -1,0 +1,27 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Caches
+.cache/
+.gemini/
+.idea/
+.vscode/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Large model weights and training checkpoints
+results/
+models/**/*.safetensors
+models/**/*.bin
+models/**/*.pt
+models/**/*.onnx
+models/**/*.h5
+
+# Local config/data if any (optional, let's allow data/ since csv is small/medium and might be useful, or let's keep data/ if they want)
+# Let's keep data files unless they are too big. The largest is 3MB, which is well below GitHub's 100MB limit.
