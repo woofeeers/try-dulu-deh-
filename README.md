@@ -2,27 +2,47 @@
 
 CekKlaim.id adalah platform berbasis web interaktif untuk memverifikasi kebenaran klaim atau informasi kesehatan berbahasa Indonesia. Sistem ini ditenagai oleh model deep learning **IndoBERT** yang telah di-fine-tune untuk membedakan antara klaim kesehatan yang valid dan hoaks.
 
+Proyek ini diajukan untuk **GWE 2026 Data Science Challenge**.
+
+---
+
+## 🏆 Informasi Tim & Proyek
+
+* **Nama Tim / Peserta:** Try Dulu Deh
+* **Anggota Tim:** Arneta Alifiana, Laula Fatimatusyifa
+* **Tema yang Dipilih:** Risk Prediction / Sentiment Analysis (Kesehatan)
+* **Link Deployment Streamlit:** [Streamlit Cloud (Placeholder)](#)
+* **Model yang Digunakan:** `indobenchmark/indobert-base-p2`
+* **Sumber Dataset:** Dataset Hoaks Kesehatan dari Repository Open Data Publik (TurnBackHoax, MAFINDO, dsb).
+
+> **Pernyataan Penggunaan AI Tools:**  
+> Proyek ini dikembangkan dengan bantuan AI Tools berupa **Antigravity (Gemini)** dan **GitHub Copilot** untuk pendampingan penulisan kode, perbaikan error, dan pembuatan struktur file, sesuai dengan syarat dan ketentuan yang diizinkan dalam pedoman GWE 2026.
+
 ---
 
 ## 📁 Struktur Repositori
 
-Sesuai rekomendasi struktur repositori, proyek ini memiliki tata letak sebagai berikut:
+Sesuai rekomendasi struktur repositori kompetisi:
 
 ```text
 ├── README.md
 ├── requirements.txt
+├── Dockerfile
+├── docker-compose.yml
 ├── notebooks/
-│   └── analysis.ipynb      # Notebook berisi analisis data & performa model
+│   └── analysis.ipynb        # Notebook lengkap: Preprocessing, EDA, Feature Eng, Modeling, Evaluasi, Kesimpulan
 ├── src/
-│   ├── app.py              # Aplikasi utama Streamlit (In-Process ML Inference)
-│   └── static/             # Aset gambar latar belakang dan ikon
+│   ├── app.py                # Aplikasi utama Streamlit (4 halaman)
+│   └── static/               # Aset gambar latar belakang dan ikon
 ├── data/
-│   ├── dataset_clean.csv   # Dataset terintegrasi hasil pembersihan
-│   └── dataset_augmented.csv # Dataset teraugmentasi kelas minoritas (Valid)
-├── models/
-│   └── indobert_hoax_model # Bobot model IndoBERT terbaik & file konfigurasi
-└── presentation/
-    └── slides.pdf          # Slide presentasi ringkasan proyek
+│   ├── train.csv             # Dataset train (stratified split)
+│   ├── val.csv               # Dataset validasi
+│   ├── test.csv              # Dataset test
+│   ├── dataset_clean.csv     # Dataset terintegrasi hasil pembersihan
+│   ├── dataset_augmented.csv # Dataset teraugmentasi kelas minoritas (Valid)
+│   └── colloquial-indonesian-lexicon.csv  # Kamus slang bahasa Indonesia
+└── models/
+    └── indobert_hoax_model   # Bobot model IndoBERT terbaik & file konfigurasi
 ```
 
 ---
@@ -51,23 +71,47 @@ Sesuai rekomendasi struktur repositori, proyek ini memiliki tata letak sebagai b
 
 ## 🖥️ Cara Menjalankan Aplikasi
 
+Aplikasi Streamlit terdiri dari 4 halaman utama:
+1. **Halaman Utama** — Deskripsi proyek, latar belakang, tujuan, dan ringkasan dataset.
+2. **EDA Dashboard** — Visualisasi interaktif: distribusi kelas, statistik deskriptif, histogram panjang karakter, boxplot jumlah kata, pie chart proporsi, dan insight shortcut learning.
+3. **Prediction / Analysis** — Halaman inti untuk memasukkan klaim dan mendapatkan klasifikasi real-time dari model IndoBERT.
+4. **About / Documentation** — Penjelasan model, metrik evaluasi, cara penggunaan, informasi tim, dan pernyataan AI tools.
+
 ### Opsi A: Berjalan Secara Lokal (Local Execution)
-Cukup jalankan satu perintah berikut untuk memuat server Streamlit yang secara langsung melakukan klasifikasi menggunakan model IndoBERT lokal:
 ```bash
 streamlit run src/app.py
 ```
-Setelah berjalan, buka browser Anda dan akses halaman web di **[http://localhost:8501](http://localhost:8501)**.
+Buka browser di **[http://localhost:8501](http://localhost:8501)**.
 
 ### Opsi B: Berjalan di Dalam Container (Docker)
-Aplikasi ini sudah mendukung containerization secara utuh. Cukup jalankan perintah berikut (pastikan aplikasi Docker Desktop Anda aktif):
 ```bash
 docker compose up --build
 ```
-Aplikasi akan dibundel secara otomatis dan dapat diakses langsung pada port **`8501`**.
+Aplikasi tersedia pada port **`8501`**.
+
+---
+
+## 📓 Notebook Analisis (`notebooks/analysis.ipynb`)
+
+Notebook ini memuat pipeline data science **end-to-end** sesuai ketentuan GWE 2026:
+
+| No | Tahap | Deskripsi |
+|----|-------|-----------|
+| 1 | **Import Pustaka** | pandas, numpy, sklearn, torch, transformers, seaborn, dll. |
+| 2 | **Memuat Dataset** | Load data train/val/test + kamus slang kolokial Indonesia |
+| 3 | **Data Preprocessing** | Lowercase, hapus angka/tanda baca, normalisasi slang, hapus bias label |
+| 4 | **EDA** | Distribusi kelas, histogram panjang karakter, statistik deskriptif |
+| 5 | **Feature Engineering** | TF-IDF Vectorizer (5000 fitur, bigram) |
+| 6 | **Pemodelan ML (Baseline)** | Logistic Regression (class_weight='balanced') |
+| 7 | **Evaluasi Model** | Classification report & confusion matrix untuk baseline + IndoBERT |
+| 8 | **Analisis OOD / Shortcut Learning** | Pengujian klaim pendek untuk membuktikan masalah generalisasi |
+| 9 | **Kesimpulan & Rekomendasi** | Ringkasan temuan dan solusi perbaikan model |
 
 ---
 
 ## 🤖 Performa Model IndoBERT
 * **Akurasi**: 100% pada Dataset Pengujian
-* **F1-Score**: 1.00 pada Dataset Pengujian (Stratified Split 15%)
+* **F1-Score**: 1.00 pada Dataset Pengujian (Stratified Split)
 * **Model Base**: `indobenchmark/indobert-base-p2`
+
+> ⚠️ **Catatan:** Performa 100% ini dipengaruhi oleh *shortcut learning* akibat bias struktural panjang teks. Lihat bagian kesimpulan di notebook untuk detail analisis dan rekomendasi.
