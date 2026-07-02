@@ -674,16 +674,28 @@ def page_eda():
         st.warning(f"⚠️ Rasio imbalance: **{ratio:.1f} : 1** (HOAKS : VALID)")
 
     with col2:
-        fig, ax = plt.subplots(figsize=(6, 4))
-        colors = ['#ff5555', '#00e898']
-        bars = ax.bar(['HOAKS (0)', 'VALID (1)'], counts.values, color=colors, width=0.5)
-        for bar, val in zip(bars, counts.values):
-            ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 15,
-                    f'{val:,}', ha='center', va='bottom', color='#1e293b', fontweight='bold', fontsize=11)
-        ax.set_ylabel('Jumlah Sampel')
-        style_ax(fig, ax, 'Distribusi Kelas pada Dataset Train')
-        st.pyplot(fig)
-        plt.close()
+        import altair as alt
+        chart_data = pd.DataFrame({
+            'Kelas': ['HOAKS (0)', 'VALID (1)'],
+            'Jumlah': counts.values
+        })
+        chart = alt.Chart(chart_data).mark_bar(cornerRadiusTopLeft=8, cornerRadiusTopRight=8).encode(
+            x=alt.X('Kelas:N', axis=alt.Axis(labelAngle=0, title='')),
+            y=alt.Y('Jumlah:Q', title='Jumlah Sampel'),
+            color=alt.Color('Kelas:N', scale=alt.Scale(domain=['HOAKS (0)', 'VALID (1)'], range=['#ff5555', '#00e898']), legend=None)
+        ).properties(
+            height=300
+        )
+        text = chart.mark_text(
+            align='center',
+            baseline='bottom',
+            dy=-5,
+            color='#1e293b',
+            fontWeight='bold'
+        ).encode(
+            text='Jumlah:Q'
+        )
+        st.altair_chart(chart + text, use_container_width=True)
 
     # ── 2. Statistik Deskriptif ──
     st.write("---")
@@ -692,39 +704,42 @@ def page_eda():
     stats.index = ['HOAKS (0)', 'VALID (1)']
     st.dataframe(stats.style.format("{:.1f}"), use_container_width=True)
 
-    # ── 3. Distribusi Panjang Karakter & Kata ──
+    # ── 3. Distribusi Panjang Karakter & Jumlah Kata ──
     st.write("---")
     st.write("### 3. Distribusi Panjang Karakter & Jumlah Kata")
     col3, col4 = st.columns(2)
 
     with col3:
-        fig2, ax2 = plt.subplots(figsize=(6, 4))
-        for label, color, name in [(0, '#ff5555', 'HOAKS'), (1, '#00e898', 'VALID')]:
-            subset = train_df[train_df['label'] == label]['char_length']
-            ax2.hist(subset, bins=50, alpha=0.6, color=color, label=name)
-        ax2.legend(facecolor='#ffffff', edgecolor='#e2e8f0', labelcolor='#1e293b')
-        ax2.set_xlabel('Panjang Karakter')
-        ax2.set_ylabel('Frekuensi')
-        style_ax(fig2, ax2, 'Histogram Panjang Karakter')
-        st.pyplot(fig2)
-        plt.close()
+        import altair as alt
+        hist_df = train_df[['label', 'char_length']].copy()
+        hist_df['Label_Name'] = hist_df['label'].map({0: 'HOAKS', 1: 'VALID'})
+        hist_chart = alt.Chart(hist_df).mark_area(
+            opacity=0.6,
+            interpolate='step'
+        ).encode(
+            x=alt.X('char_length:Q', bin=alt.Bin(maxbins=50), title='Panjang Karakter'),
+            y=alt.Y('count():Q', stack=None, title='Frekuensi'),
+            color=alt.Color('Label_Name:N', scale=alt.Scale(domain=['HOAKS', 'VALID'], range=['#ff5555', '#00e898']), title='Kelas')
+        ).properties(
+            title='Histogram Panjang Karakter',
+            height=300
+        )
+        st.altair_chart(hist_chart, use_container_width=True)
         st.caption("Klaim HOAKS cenderung sangat pendek (< 200 karakter), sedangkan artikel VALID jauh lebih panjang.")
 
     with col4:
-        fig3, ax3 = plt.subplots(figsize=(6, 4))
-        bp_data = [train_df[train_df['label']==0]['word_count'], train_df[train_df['label']==1]['word_count']]
-        bp = ax3.boxplot(bp_data, labels=['HOAKS', 'VALID'], patch_artist=True,
-                         boxprops=dict(edgecolor='#1e293b'),
-                         medianprops=dict(color='#1e293b', linewidth=2),
-                         whiskerprops=dict(color='#1e293b'),
-                         capprops=dict(color='#1e293b'),
-                         flierprops=dict(marker='o', markerfacecolor='#ff5555', markersize=3, alpha=0.4))
-        bp['boxes'][0].set_facecolor('#ffcccc')
-        bp['boxes'][1].set_facecolor('#ccffcc')
-        ax3.set_ylabel('Jumlah Kata')
-        style_ax(fig3, ax3, 'Boxplot Jumlah Kata per Kelas')
-        st.pyplot(fig3)
-        plt.close()
+        import altair as alt
+        box_df = train_df[['label', 'word_count']].copy()
+        box_df['Label_Name'] = box_df['label'].map({0: 'HOAKS', 1: 'VALID'})
+        box_chart = alt.Chart(box_df).mark_boxplot(extent='min-max', size=50).encode(
+            x=alt.X('Label_Name:N', title='Kelas', axis=alt.Axis(labelAngle=0)),
+            y=alt.Y('word_count:Q', title='Jumlah Kata'),
+            color=alt.Color('Label_Name:N', scale=alt.Scale(domain=['HOAKS', 'VALID'], range=['#ff5555', '#00e898']), legend=None)
+        ).properties(
+            title='Boxplot Jumlah Kata per Kelas',
+            height=300
+        )
+        st.altair_chart(box_chart, use_container_width=True)
         st.caption("Boxplot menunjukkan perbedaan signifikan — indikasi kuat potensi shortcut learning.")
 
     # ── 4. Pie Charts ──
@@ -733,29 +748,38 @@ def page_eda():
     col5, col6 = st.columns(2)
 
     with col5:
-        fig4, ax4 = plt.subplots(figsize=(5, 5))
-        ax4.pie(counts.values, labels=['HOAKS', 'VALID'], autopct='%1.1f%%',
-                colors=['#ff5555', '#00e898'], startangle=90,
-                textprops={'color': 'white', 'fontsize': 11, 'fontweight': 'bold'},
-                wedgeprops={'edgecolor': DARK_BG, 'linewidth': 2})
-        fig4.patch.set_facecolor(DARK_BG)
-        ax4.set_title('Proporsi Kelas (Train)', color='#1e293b', fontsize=12, fontweight='bold', pad=14)
-        st.pyplot(fig4)
-        plt.close()
+        import altair as alt
+        pie_data = pd.DataFrame({
+            'Kelas': ['HOAKS', 'VALID'],
+            'Jumlah': counts.values
+        })
+        pie_chart = alt.Chart(pie_data).mark_arc(innerRadius=50).encode(
+            theta=alt.Theta(field="Jumlah", type="quantitative"),
+            color=alt.Color(field="Kelas", type="nominal", scale=alt.Scale(domain=['HOAKS', 'VALID'], range=['#ff5555', '#00e898']), title='Kelas'),
+            tooltip=['Kelas', 'Jumlah']
+        ).properties(
+            title='Proporsi Kelas (Train)',
+            height=300
+        )
+        st.altair_chart(pie_chart, use_container_width=True)
 
     with col6:
         try:
+            import altair as alt
             sizes = [len(train_df), len(val_df), len(test_df)]
-            labels_s = [f'Train ({sizes[0]:,})', f'Val ({sizes[1]:,})', f'Test ({sizes[2]:,})']
-            fig5, ax5 = plt.subplots(figsize=(5, 5))
-            ax5.pie(sizes, labels=labels_s, autopct='%1.1f%%',
-                    colors=['#d4d4d4', '#ffffff', '#48cae4'], startangle=90,
-                    textprops={'color': 'white', 'fontsize': 10, 'fontweight': 'bold'},
-                    wedgeprops={'edgecolor': DARK_BG, 'linewidth': 2})
-            fig5.patch.set_facecolor(DARK_BG)
-            ax5.set_title('Pembagian Dataset (Train/Val/Test)', color='#1e293b', fontsize=12, fontweight='bold', pad=14)
-            st.pyplot(fig5)
-            plt.close()
+            split_data = pd.DataFrame({
+                'Dataset': [f'Train ({sizes[0]:,})', f'Val ({sizes[1]:,})', f'Test ({sizes[2]:,})'],
+                'Jumlah': sizes
+            })
+            split_chart = alt.Chart(split_data).mark_arc(innerRadius=50).encode(
+                theta=alt.Theta(field="Jumlah", type="quantitative"),
+                color=alt.Color(field="Dataset", type="nominal", scale=alt.Scale(domain=[f'Train ({sizes[0]:,})', f'Val ({sizes[1]:,})', f'Test ({sizes[2]:,})'], range=['#94a3b8', '#cbd5e1', '#3b82f6']), title='Dataset'),
+                tooltip=['Dataset', 'Jumlah']
+            ).properties(
+                title='Pembagian Dataset (Train/Val/Test)',
+                height=300
+            )
+            st.altair_chart(split_chart, use_container_width=True)
         except Exception:
             pass
 

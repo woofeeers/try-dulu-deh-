@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+    environment:
+      - HF_HOME=/workspace/huggingface_cache
+    volumes:
+      - hf_cache:/workspace/huggingface_cache
+
+volumes:
+  hf_cache:
