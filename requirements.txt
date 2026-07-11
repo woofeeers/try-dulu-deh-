@@ -1,22 +1,8 @@
-requests==2.31.0
-beautifulsoup4==4.12.3
-pandas==2.2.0
-datasets==2.18.0
-deep-translator==1.11.4
-nltk==3.8.1
-scikit-learn==1.4.1.post1
-tqdm==4.66.2
-huggingface-hub==0.21.4
-rapidfuzz==3.6.1
-matplotlib==3.8.3
-seaborn==0.13.2
-wordcloud==1.9.3
-PySastrawi==1.2.0
+--extra-index-url https://download.pytorch.org/whl/cpu
+streamlit
+pandas
+numpy
+scikit-learn
 torch
 transformers
-accelerate
-streamlit
-fastapi==0.110.0
-uvicorn==0.27.0
 gdown
-google-generativeai
