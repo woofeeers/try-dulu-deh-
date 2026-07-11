@@ -1,0 +1,349 @@
+<!DOCTYPE html><html class="dark" lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Tentang Kami | CekKlaim.id</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&amp;family=Inter:wght@400;700&amp;family=Source+Serif+4:ital,wght@1,400&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed-variant": "#414658",
+                    "surface-variant": "#323537",
+                    "background": "#101415",
+                    "on-secondary-container": "#005f6d",
+                    "error-container": "#93000a",
+                    "surface-dim": "#101415",
+                    "secondary-container": "#00e0ff",
+                    "surface-container-high": "#272a2c",
+                    "on-error": "#690005",
+                    "inverse-on-surface": "#2d3133",
+                    "surface-tint": "#b7c4ff",
+                    "secondary-fixed": "#a5eeff",
+                    "on-secondary": "#00363f",
+                    "on-tertiary-fixed": "#161b2b",
+                    "inverse-surface": "#e0e3e5",
+                    "on-surface": "#e0e3e5",
+                    "on-primary-fixed": "#001452",
+                    "tertiary-fixed": "#dee1f7",
+                    "surface-bright": "#363a3b",
+                    "on-error-container": "#ffdad6",
+                    "on-secondary-fixed-variant": "#004e5a",
+                    "tertiary-fixed-dim": "#c2c6db",
+                    "on-primary-fixed-variant": "#0038b6",
+                    "on-tertiary": "#2b3040",
+                    "surface-container-highest": "#323537",
+                    "tertiary-container": "#616578",
+                    "primary-fixed": "#dde1ff",
+                    "on-primary": "#002682",
+                    "outline-variant": "#434656",
+                    "secondary-fixed-dim": "#00daf8",
+                    "on-secondary-fixed": "#001f25",
+                    "on-tertiary-container": "#e0e3e5",
+                    "on-primary-container": "#dfe3ff",
+                    "primary": "#b7c4ff",
+                    "on-surface-variant": "#c3c5d9",
+                    "surface-container": "#1d2022",
+                    "surface-container-lowest": "#0b0f10",
+                    "outline": "#8d90a2",
+                    "primary-container": "#0052ff",
+                    "surface": "#101415",
+                    "tertiary": "#c2c6db",
+                    "secondary": "#b9f1ff",
+                    "inverse-primary": "#004ced",
+                    "surface-container-low": "#191c1e",
+                    "primary-fixed-dim": "#b7c4ff",
+                    "on-background": "#e0e3e5",
+                    "error": "#ffb4ab"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "element-gap": "24px",
+                    "container-padding": "40px",
+                    "section-gap": "80px",
+                    "unit": "8px",
+                    "glass-padding": "32px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Plus Jakarta Sans"],
+                    "body-md": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "display-lg-mobile": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "body-lg": ["Inter"],
+                    "accent-italic": ["\"Source Serif 4\""]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "accent-italic": ["16px", {"lineHeight": "1.5", "letterSpacing": "0.02em", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #101415;
+            color: #e0e3e5;
+            scroll-behavior: smooth;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+        }
+
+        .cinematic-shadow {
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 82, 255, 0.1);
+        }
+
+        .text-glow-primary {
+            text-shadow: 0 0 20px rgba(183, 196, 255, 0.4);
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .gradient-mesh {
+            background: radial-gradient(at 0% 0%, rgba(0, 82, 255, 0.15) 0%, transparent 50%),
+                        radial-gradient(at 100% 100%, rgba(0, 224, 255, 0.1) 0%, transparent 50%);
+        }
+    </style>
+</head>
+<body class="font-body-md selection:bg-secondary/30">
+<!-- NAVIGATION SHELL -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-container-padding h-20 bg-surface/40 backdrop-blur-xl border-b border-white/10">
+<div class="flex items-center gap-4">
+<span class="font-display-lg text-2xl font-bold text-primary tracking-tight">CekKlaim.id</span>
+</div>
+<nav class="hidden md:flex items-center gap-12">
+<a class="text-primary font-bold border-b-2 border-primary px-1 py-1 font-body-md transition-all duration-300" href="#">Tentang Kami</a>
+<a class="text-on-surface-variant hover:text-white transition-all duration-300 px-1 py-1 font-body-md" href="#">Cek Klaim</a>
+<a class="text-on-surface-variant hover:text-white transition-all duration-300 px-1 py-1 font-body-md" href="#">Dashboard Analisis</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-white/10 transition-all duration-300 rounded-full">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+<div class="w-10 h-10 rounded-full border border-white/20 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional close-up portrait of a medical researcher" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcGtRagFnBinPL6KtTmrydJr3sdDyXiKQ3HqmmWqxcmB5xkiGvXKpeicrKSlDc3DwPkn4TjeodOAZn0wvYu3Tl3cksjL4WL5JiQE_fmj8FOFaycEN_8X3VoqVH_7_nnQDJG40f6H08gnWkxBbkkywsH2A5uC1V1GQ7bxT7tQxDxXmQw2hKp2u2R7lZD01kqK4_sD900bdYnfOM9jneW5tjD-9DADIDNKqzzE9qF6koy09jG_rOd6Wv">
+</div>
+</div>
+</header>
+<main>
+<!-- HERO SECTION: REDESIGNED CENTERED LANDING -->
+<section class="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20">
+<!-- Background Layer -->
+<div class="absolute inset-0 z-0">
+<div class="absolute inset-0 bg-gradient-to-b from-background via-background/60 to-background z-10"></div>
+<div class="w-full h-full bg-cover bg-center opacity-40" data-alt="Subtle medical tech background" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBl1mXhsRBdlawOsL3BnXw-GwPq_iib1LTVZJFWSmgDYC7_-LvT1bTnwl3tIDTESWGiFWyJXqG_c1v4URPpKbf0iDZTjA1VS8iqGnFaAvdfQoslJdqCvkrMyB9z7PfWWgIH2nij0lWvqg3Mva5nF-6x86LOYjuHDX24jVMVVXGuNYzrQqOfhXqYGTsBBj1RR21iVLJ8emQ3MLMoXzEb3H6ai_GdfTiVcmoHsewVMCkY1_tdu08P6WK4')"></div>
+</div>
+<div class="container mx-auto px-container-padding relative z-20 text-center max-w-4xl">
+<span class="font-label-caps text-label-caps text-secondary tracking-[0.3em] mb-8 block uppercase animate-pulse">Visi &amp; Misi Kami</span>
+<h1 class="font-display-lg text-[64px] md:text-[84px] text-white mb-8 leading-none text-glow-primary">
+                    CekKlaim.id
+                </h1>
+<div class="glass-panel p-glass-padding rounded-2xl cinematic-shadow mx-auto">
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed mb-0">
+                        Di era digital yang serba cepat, penyebaran informasi medis yang tidak akurat telah menjadi ancaman nyata bagi keselamatan publik. CekKlaim.id hadir sebagai benteng pertahanan digital untuk memulihkan integritas informasi kesehatan melalui teknologi AI tercanggih, memastikan setiap klaim yang Anda terima adalah fakta yang tervalidasi secara medis.
+                    </p>
+</div>
+<div class="mt-12 flex justify-center gap-6">
+<button class="bg-primary-container text-white px-10 py-4 rounded-full font-bold shadow-[0_0_20px_rgba(0,82,255,0.4)] hover:scale-105 active:scale-95 transition-all duration-300">
+                        Jelajahi Platform
+                    </button>
+<button class="bg-white/5 border border-white/20 backdrop-blur-md text-white px-10 py-4 rounded-full font-bold hover:bg-white/10 transition-all duration-300">
+                        Pelajari AI Kami
+                    </button>
+</div>
+</div>
+<div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-30">
+<span class="material-symbols-outlined text-4xl">keyboard_double_arrow_down</span>
+</div>
+</section>
+<!-- PROJECT GOALS: TUJUAN PROYEK -->
+<section class="section-gap container mx-auto px-container-padding">
+<div class="text-center mb-16">
+<h2 class="font-display-lg text-display-lg text-white mb-4">Tujuan Proyek</h2>
+<p class="font-accent-italic text-accent-italic text-secondary italic text-lg">Menuju Ekosistem Informasi Kesehatan yang Presisi</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-element-gap">
+<!-- Goal 1 -->
+<div class="glass-panel p-10 rounded-3xl group hover:bg-white/5 transition-all duration-500 border-white/10 hover:border-secondary/30 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-secondary/5 blur-[50px] -mr-16 -mt-16"></div>
+<div class="w-16 h-16 rounded-2xl bg-secondary/10 flex items-center justify-center mb-8 border border-secondary/20">
+<span class="material-symbols-outlined text-secondary text-3xl" data-icon="fact_check">fact_check</span>
+</div>
+<h3 class="font-headline-md text-2xl text-white mb-4">Fact-Checking Otomatis</h3>
+<p class="text-on-surface-variant text-lg leading-relaxed">Mengautomasi verifikasi klaim kesehatan menggunakan model Natural Language Processing (NLP) tingkat lanjut untuk memberikan akurasi instan terhadap ribuan basis data medis.</p>
+</div>
+<!-- Goal 2 -->
+<div class="glass-panel p-10 rounded-3xl group hover:bg-white/5 transition-all duration-500 border-white/10 hover:border-primary/30 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-[50px] -mr-16 -mt-16"></div>
+<div class="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-8 border border-primary/20">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="all_inclusive">all_inclusive</span>
+</div>
+<h3 class="font-headline-md text-2xl text-white mb-4">End-to-End Workflow</h3>
+<p class="text-on-surface-variant text-lg leading-relaxed">Menyediakan alur kerja komprehensif mulai dari deteksi klaim, pencarian bukti medis otomatis, hingga penarikan kesimpulan akhir yang dapat dipertanggungjawabkan.</p>
+</div>
+</div>
+</section>
+<!-- DATASET SUMMARY: RINGKASAN DATASET -->
+<section class="section-gap relative py-24 overflow-hidden">
+<div class="absolute inset-0 gradient-mesh opacity-20"></div>
+<div class="container mx-auto px-container-padding relative z-10">
+<div class="text-center mb-16">
+<h2 class="font-display-lg text-display-lg text-white mb-4">Ringkasan Dataset</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">Fondasi model kami dibangun di atas ribuan data medis terkurasi yang melalui proses validasi ketat oleh para ahli di bidangnya.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Train -->
+<div class="glass-panel p-8 rounded-2xl border-t-2 border-t-secondary/50 group hover:bg-white/5 transition-all duration-500">
+<span class="text-label-caps font-label-caps text-on-surface-variant block mb-4">TRAIN SET</span>
+<div class="flex items-baseline gap-2 mb-2">
+<span class="text-5xl font-bold text-white counter" data-target="2120">0</span>
+<span class="text-secondary text-xl font-bold">Samples</span>
+</div>
+<div class="h-1 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[70%]"></div>
+</div>
+</div>
+<!-- Validation -->
+<div class="glass-panel p-8 rounded-2xl border-t-2 border-t-primary/50 group hover:bg-white/5 transition-all duration-500">
+<span class="text-label-caps font-label-caps text-on-surface-variant block mb-4">VALIDASI</span>
+<div class="flex items-baseline gap-2 mb-2">
+<span class="text-5xl font-bold text-white counter" data-target="454">0</span>
+<span class="text-primary text-xl font-bold">Samples</span>
+</div>
+<div class="h-1 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[15%]"></div>
+</div>
+</div>
+<!-- Test -->
+<div class="glass-panel p-8 rounded-2xl border-t-2 border-t-tertiary/50 group hover:bg-white/5 transition-all duration-500">
+<span class="text-label-caps font-label-caps text-on-surface-variant block mb-4">TEST SET</span>
+<div class="flex items-baseline gap-2 mb-2">
+<span class="text-5xl font-bold text-white counter" data-target="455">0</span>
+<span class="text-tertiary text-xl font-bold">Samples</span>
+</div>
+<div class="h-1 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-tertiary w-[15%]"></div>
+</div>
+</div>
+<!-- Total -->
+<div class="relative group">
+<div class="absolute -inset-1 bg-gradient-to-r from-secondary to-primary rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+<div class="relative glass-panel p-8 rounded-2xl border-white/20 h-full bg-surface-container-low/60 flex flex-col justify-center">
+<span class="text-label-caps font-label-caps text-secondary block mb-4">TOTAL DATASET</span>
+<div class="flex items-baseline gap-2">
+<span class="text-6xl font-extrabold text-white tracking-tighter counter" data-target="3029">0</span>
+</div>
+<p class="text-on-surface-variant mt-2 text-sm">Unified Clinical Knowledge Base</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA SECTION -->
+<section class="section-gap container mx-auto px-container-padding pb-32">
+<div class="glass-panel p-16 rounded-3xl text-center relative overflow-hidden border-white/10">
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[120px] -mr-32 -mt-32"></div>
+<div class="absolute bottom-0 left-0 w-64 h-64 bg-secondary/10 blur-[120px] -ml-32 -mb-32"></div>
+<h2 class="font-display-lg text-4xl md:text-5xl text-white mb-6 relative z-10">Mulai Verifikasi Sekarang</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl mx-auto mb-10 relative z-10">Manfaatkan kekuatan kecerdasan buatan untuk menjaga kesehatan Anda dari gelombang misinformasi.</p>
+<div class="flex flex-col md:flex-row gap-4 justify-center relative z-10">
+<button class="bg-primary text-on-primary px-10 py-4 rounded-full font-bold shadow-[0_0_30px_rgba(183,196,255,0.3)] hover:scale-105 transition-all duration-300">
+                        Cek Klaim Sekarang
+                    </button>
+<button class="bg-white/5 border border-white/20 backdrop-blur-md text-white px-10 py-4 rounded-full font-bold hover:bg-white/10 transition-all duration-300">
+                        Lihat Dashboard
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- MOBILE NAV -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-t border-white/10 flex justify-around items-center h-16">
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined" data-icon="info">info</span>
+<span class="text-[10px] font-bold">Tentang</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="fact_check">fact_check</span>
+<span class="text-[10px]">Cek Klaim</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="text-[10px]">Dashboard</span>
+</button>
+</nav>
+<script>
+        // Counter Animation logic
+        const counters = document.querySelectorAll('.counter');
+        const speed = 200;
+
+        const animateCounters = () => {
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                const count = +counter.innerText;
+                const increment = target / speed;
+
+                if (count < target) {
+                    counter.innerText = Math.ceil(count + increment);
+                    setTimeout(animateCounters, 1);
+                } else {
+                    counter.innerText = target;
+                }
+            });
+        };
+
+        // Intersection Observer for triggering animation
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounters();
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        const datasetSection = document.querySelector('.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4');
+        if (datasetSection) observer.observe(datasetSection);
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.classList.add('bg-surface/90');
+            } else {
+                header.classList.remove('bg-surface/90');
+            }
+        });
+    </script>
+</body></html>

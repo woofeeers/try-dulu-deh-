@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html class="dark" lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>CekKlaim.id | High-Fidelity Data Intelligence</title>
+    <!-- Tailwind CSS with Forms and Container Queries plugins -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Google Fonts: Plus Jakarta Sans (Headlines), Inter (Body), Source Serif 4 (Accents) -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+    <!-- Material Icons for UI accents -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-tertiary-fixed-variant": "#414658",
+                        "surface-variant": "#323537",
+                        "background": "#101415",
+                        "on-secondary-container": "#005f6d",
+                        "error-container": "#93000a",
+                        "surface-dim": "#101415",
+                        "secondary-container": "#00e0ff",
+                        "surface-container-high": "#272a2c",
+                        "on-error": "#690005",
+                        "inverse-on-surface": "#2d3133",
+                        "surface-tint": "#b7c4ff",
+                        "secondary-fixed": "#a5eeff",
+                        "on-secondary": "#00363f",
+                        "on-tertiary-fixed": "#161b2b",
+                        "inverse-surface": "#e0e3e5",
+                        "on-surface": "#e0e3e5",
+                        "on-primary-fixed": "#001452",
+                        "tertiary-fixed": "#dee1f7",
+                        "surface-bright": "#363a3b",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#004e5a",
+                        "tertiary-fixed-dim": "#c2c6db",
+                        "on-primary-fixed-variant": "#0038b6",
+                        "on-tertiary": "#2b3040",
+                        "surface-container-highest": "#323537",
+                        "tertiary-container": "#616578",
+                        "primary-fixed": "#dde1ff",
+                        "on-primary": "#002682",
+                        "outline-variant": "#434656",
+                        "secondary-fixed-dim": "#00daf8",
+                        "on-secondary-fixed": "#001f25",
+                        "on-tertiary-container": "#e0e3f9",
+                        "on-primary-container": "#dfe3ff",
+                        "primary": "#b7c4ff",
+                        "on-surface-variant": "#c3c5d9",
+                        "surface-container": "#1d2022",
+                        "surface-container-lowest": "#0b0f10",
+                        "outline": "#8d90a2",
+                        "primary-container": "#0052ff",
+                        "surface": "#101415",
+                        "tertiary": "#c2c6db",
+                        "secondary": "#b9f1ff",
+                        "inverse-primary": "#004ced",
+                        "surface-container-low": "#191c1e",
+                        "primary-fixed-dim": "#b7c4ff",
+                        "on-background": "#e0e3e5",
+                        "error": "#ffb4ab"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "0.75rem",
+                        "xl": "1rem",
+                        "2xl": "1.5rem",
+                        "3xl": "2rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "element-gap": "24px",
+                        "container-padding": "40px",
+                        "section-gap": "80px",
+                        "unit": "8px",
+                        "glass-padding": "32px"
+                    },
+                    fontFamily: {
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "body-md": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "display-lg-mobile": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-lg": ["Inter"],
+                        "accent-italic": ["\"Source Serif 4\""]
+                    },
+                    fontSize: {
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "display-lg-mobile": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "accent-italic": ["16px", {"lineHeight": "1.5", "letterSpacing": "0.02em", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #101415;
+            color: #e0e3e5;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+        
+        /* Premium Cinematic Glass Panel */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(24px) saturate(120%);
+            -webkit-backdrop-filter: blur(24px) saturate(120%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.08), 
+                        0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-panel:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        /* Glowing accents */
+        .cinematic-glow {
+            box-shadow: 0 0 40px rgba(0, 82, 255, 0.25);
+        }
+        .cyan-glow {
+            box-shadow: 0 0 30px rgba(0, 224, 255, 0.3);
+        }
+        .green-glow {
+            box-shadow: 0 0 30px rgba(74, 222, 128, 0.25);
+        }
+        .coral-glow {
+            box-shadow: 0 0 30px rgba(255, 180, 171, 0.3);
+        }
+        
+        /* Navigation Links */
+        .nav-link-active {
+            color: #b9f1ff; /* secondary */
+            border-bottom: 2px solid #b9f1ff;
+            text-shadow: 0 0 12px rgba(185, 241, 255, 0.5);
+        }
+
+        /* Ambient follow light */
+        .ambient-light {
+            background: radial-gradient(circle 400px at 50% 50%, rgba(0, 82, 255, 0.12) 0%, rgba(0, 224, 255, 0.04) 50%, transparent 100%);
+            pointer-events: none;
+            transition: transform 0.1s ease-out;
+        }
+
+        /* Keyframe animations */
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        .scanning-bar {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #00e0ff, transparent);
+            box-shadow: 0 0 15px #00e0ff, 0 0 30px #0052ff;
+            animation: scan 2s linear infinite;
+        }
+
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.4; }
+        }
+
+        .pulse-ambient {
+            animation: pulse-slow 10s infinite ease-in-out;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #101415;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #323537;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #434656;
+        }
+
+        /* Smooth tab transition */
+        .page-section {
+            transition: opacity 0.5s ease-in-out, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .page-section.hidden {
+            display: none !important;
+            opacity: 0;
+            transform: translateY(15px);
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md antialiased selection:bg-secondary/30">
+
+    <!-- Interactive Ambient Floor Background -->
+    <div class="fixed inset-0 -z-20 bg-gradient-to-br from-background via-[#0a0f1e] to-background"></div>
+    <div class="fixed inset-0 -z-10 pulse-ambient bg-[radial-gradient(circle_at_70%_20%,rgba(0,224,255,0.05),transparent_50%)]"></div>
+    <div class="fixed inset-0 -z-10 pulse-ambient bg-[radial-gradient(circle_at_30%_80%,rgba(0,82,255,0.06),transparent_60%)]" style="animation-delay: 3s;"></div>
+    <div id="cursor-glow" class="fixed -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] ambient-light -z-10 opacity-0 transition-opacity duration-700"></div>
+
+    <!-- Navigation Header -->
+    <header class="fixed top-0 w-full z-50 flex justify-between items-center px-container-padding h-20 bg-surface/10 backdrop-blur-2xl border-b border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]">
+        <div class="flex items-center gap-12">
+            <span class="font-display-lg text-2xl font-bold text-primary tracking-tighter cursor-pointer" onclick="showPage('cek-klaim')">CekKlaim.id</span>
+            <nav class="hidden md:flex gap-8">
+                <a class="nav-link nav-link-active h-20 flex items-center px-1 font-medium tracking-wide active:scale-95 transition-all cursor-pointer" data-page="cek-klaim" onclick="showPage('cek-klaim')">Cek Klaim</a>
+                <a class="nav-link text-on-surface-variant hover:text-white h-20 flex items-center px-1 font-medium tracking-wide active:scale-95 transition-all cursor-pointer" data-page="dashboard" onclick="showPage('dashboard')">Dashboard Analisis</a>
+                <a class="nav-link text-on-surface-variant hover:text-white h-20 flex items-center px-1 font-medium tracking-wide active:scale-95 transition-all cursor-pointer" data-page="tentang" onclick="showPage('tentang')">Tentang Kami</a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="p-2 rounded-full hover:bg-white/10 transition-all duration-300 relative group" onclick="toggleNotification()">
+                <span class="material-symbols-outlined text-primary text-2xl">notifications</span>
+                <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-secondary rounded-full cyan-glow"></span>
+            </button>
+            <button class="p-2 rounded-full hover:bg-white/10 transition-all duration-300" onclick="showConfigModal()">
+                <span class="material-symbols-outlined text-primary text-2xl">settings</span>
+            </button>
+            <div class="w-10 h-10 rounded-full border border-white/20 overflow-hidden ml-2 shadow-[0_0_12px_rgba(0,82,255,0.2)]">
+                <img class="w-full h-full object-cover" alt="User Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzsln33gyjTOqHefYqDX33ip2P1uLjG-yf61J3kHpSMaz0fy9DISldSfHe5ZWhM7YbVqcFgS7fKaRwcXplVar9j2n6ZQB0fg0V605E0GuvhvhXHE4ywSoQEcDVkGqhWUAuMVrOZ0YOl25tHL047UvgzZ1E4HVhWSJuY94wvhiuy8JHQkrBQPiwaoHx-cgS5zD3zSEZ7chISs33hj4b3MMuKYFFh6ajGSQQLGYrDVqzrrKfT3yYJTdN">
+            </div>
+        </div>
+    </header>
+
+    <!-- MOBILE NAV DRAWER (Bottom Bar) -->
+    <nav class="md:hidden fixed bottom-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-t border-white/10 flex justify-around items-center h-16 shadow-[0_-8px_32px_rgba(0,0,0,0.5)]">
+        <button class="mobile-nav-link flex flex-col items-center gap-1 text-primary" data-page="cek-klaim" onclick="showPage('cek-klaim')">
+            <span class="material-symbols-outlined text-xl">fact_check</span>
+            <span class="text-[10px] font-bold">Cek Klaim</span>
+        </button>
+        <button class="mobile-nav-link flex flex-col items-center gap-1 text-on-surface-variant" data-page="dashboard" onclick="showPage('dashboard')">
+            <span class="material-symbols-outlined text-xl">analytics</span>
+            <span class="text-[10px]">Dashboard</span>
+        </button>
+        <button class="mobile-nav-link flex flex-col items-center gap-1 text-on-surface-variant" data-page="tentang" onclick="showPage('tentang')">
+            <span class="material-symbols-outlined text-xl">info</span>
+            <span class="text-[10px]">Tentang</span>
+        </button>
+    </nav>
+
+    <!-- Notification Toast Popup -->
+    <div id="notification-toast" class="fixed top-24 right-8 z-50 glass-panel rounded-2xl p-6 max-w-sm hidden opacity-0 translate-y-[-10px] transition-all duration-300">
+        <div class="flex items-start gap-4">
+            <span class="material-symbols-outlined text-secondary-container mt-1">info</span>
+            <div>
+                <h4 class="font-bold text-white mb-1">Status Sistem Aktif</h4>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Model NLP CekKlaim v3.5-Precision berhasil dimuat dengan 3,029 data referensi klinis.</p>
+            </div>
+            <button class="text-on-surface-variant hover:text-white" onclick="toggleNotification(false)">
+                <span class="material-symbols-outlined text-sm">close</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <main class="min-h-screen pt-28 pb-20 md:pb-28">
+
+        <!-- ============================================== -->
+        <!-- SECTION 1: CEK KLAIM (TRUTH ENGINE) -->
+        <!-- ============================================== -->
+        <section id="page-cek-klaim" class="page-section px-container-padding max-w-5xl mx-auto">
+            
+            <!-- Headline block -->
+            <div class="text-center mb-10 max-w-3xl mx-auto">
+                <h1 class="font-display-lg text-display-lg-mobile md:text-display-lg text-white mb-4">Verifikasi Klaim Kesehatan</h1>
+                <p class="font-accent-italic text-accent-italic text-secondary text-lg leading-relaxed">
+                    Masukkan klaim medis atau berita kesehatan untuk dianalisis oleh mesin kebenaran bertenaga AI kami dan verifikasi konsensus klinis.
+                </p>
+            </div>
+
+
+            <!-- Input Box Canvas -->
+            <div class="glass-panel p-glass-padding rounded-3xl cinematic-glow relative overflow-hidden mb-10" id="input-card">
+                <!-- Glowing accent line at top -->
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-secondary to-transparent opacity-30"></div>
+                <div id="scanning-line" class="hidden scanning-bar"></div>
+
+                <div class="flex flex-col gap-6">
+                    <div class="relative">
+                        <span class="absolute left-4 top-5 material-symbols-outlined text-secondary-container text-3xl">fact_check</span>
+                        <textarea id="claim-input" class="w-full bg-transparent border-0 border-b border-white/20 pl-16 pr-4 pt-4 pb-6 font-body-lg text-body-lg text-on-surface placeholder:text-on-surface-variant/40 focus:ring-0 focus:outline-none focus:border-secondary transition-all" rows="2" placeholder="Tempelkan teks atau link klaim kesehatan di sini..."></textarea>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <div class="flex gap-3">
+                            <button class="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 hover:bg-white/5 transition-all text-xs font-label-caps text-on-surface hover:border-secondary-container/30" onclick="alert('Fitur lampiran file simulasi terintegrasi.')">
+                                <span class="material-symbols-outlined text-sm">attachment</span> Lampirkan Dokumen
+                            </button>
+                            <button class="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 hover:bg-white/5 transition-all text-xs font-label-caps text-on-surface hover:border-secondary-container/30" onclick="alert('Fitur analisis tautan otomatis aktif.')">
+                                <span class="material-symbols-outlined text-sm">language</span> Tempel URL
+                            </button>
+                        </div>
+                        
+                        <button id="btn-analyse" class="w-full sm:w-auto bg-primary-container text-on-primary-container px-8 py-3.5 rounded-full font-bold shadow-[0_0_20px_rgba(0,82,255,0.3)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 hover:bg-secondary-container hover:text-on-secondary-container hover:shadow-[0_0_30px_rgba(0,224,255,0.5)] cursor-pointer" onclick="runAnalysis()">
+                            Mulai Analisis <span class="material-symbols-outlined text-lg">rocket_launch</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCANNER SIMULATOR (HIDDEN BY DEFAULT) -->
+            <div id="analysis-loader" class="hidden glass-panel p-glass-padding rounded-3xl text-center mb-10 min-h-[250px] flex flex-col justify-center items-center gap-6">
+                <div class="relative w-16 h-16">
+                    <div class="absolute inset-0 rounded-full border-4 border-primary/20"></div>
+                    <div class="absolute inset-0 rounded-full border-4 border-secondary border-t-transparent animate-spin"></div>
+                </div>
+                <div class="space-y-2">
+                    <h3 class="font-headline-md text-xl text-secondary animate-pulse">Memindai Database AI...</h3>
+                    <!-- Simulated status feed -->
+                    <p id="loader-status" class="text-sm text-on-surface-variant font-mono h-6 transition-all duration-300">Inisialisasi modul NLP...</p>
+                </div>
+            </div>
+
+            <!-- RESULT OUTCOME CANVAS -->
+            <div id="analysis-result-container" class="hidden space-y-8 animate-fade-in">
+                
+                <!-- Toggle manual state just for showcase -->
+                <div class="flex justify-end gap-2 text-xs">
+                    <span class="text-on-surface-variant flex items-center">Simulasikan Hasil:</span>
+                    <button class="px-3 py-1 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 text-error font-bold" onclick="showResultState('hoax')">Hoax</button>
+                    <button class="px-3 py-1 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 text-secondary-container font-bold" onclick="showResultState('valid')">Valid</button>
+                </div>
+
+                <!-- STATE A: HOAX SCREEN -->
+                <div id="result-hoax" class="hidden space-y-6">
+                    <div class="flex justify-center">
+                        <div class="bg-error-container/20 text-error border border-error/30 px-10 py-4 rounded-full flex items-center gap-3 animate-pulse coral-glow">
+                            <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">error</span>
+                            <span class="font-display-lg text-headline-md font-bold tracking-tight">HOAX / TIDAK VALID</span>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-glass-padding rounded-3xl cinematic-glow relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1.5 h-full bg-error"></div>
+                        <div class="flex flex-col gap-6">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-error text-3xl">info</span>
+                                <h3 class="font-headline-md text-headline-md text-on-surface">Ringkasan Analisis Medis</h3>
+                            </div>
+                            <div class="space-y-4 font-body-md text-body-md text-on-surface-variant leading-relaxed" id="hoax-explanation-container">
+                                <p>Klaim ini dikategorikan sebagai <strong class="text-error">Hoax / Tidak Valid</strong> karena tidak memiliki dasar ilmiah yang kuat. Meskipun bahan alami seperti bawang putih memiliki manfaat kesehatan umum, klaim bahwa ia dapat menghentikan pembelahan sel kanker secara instan atau menyembuhkan tumor dalam hitungan jam adalah misinformasi berbahaya yang dapat menunda pengobatan medis terstandar.</p>
+                                <p>Pola misinformasi yang terdeteksi meliputi penggunaan bahasa bombastis, eksploitasi ketakutan pasien, ketiadaan referensi jurnal ilmiah internasional yang diakui, serta generalisasi berlebihan dari hasil uji laboratorium cawan petri (in vitro) langsung ke manusia.</p>
+                                <div class="pt-4 border-t border-white/10">
+                                    <p class="font-accent-italic text-accent-italic text-primary border-l-2 border-primary pl-4">
+                                        "Klaim penyembuhan instan tanpa protokol medis terstandarisasi adalah ciri khas penipuan kesehatan yang dapat berakibat fatal bagi pasien."
+                                        <span class="block mt-2 font-bold text-xs font-label-caps text-on-surface-variant uppercase tracking-wider">— Dr. Sarah Wijaya, Sp.B(K)Onk.</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STATE B: VALID SCREEN -->
+                <div id="result-valid" class="hidden space-y-6">
+                    <div class="flex justify-center">
+                        <div class="bg-green-500/10 text-[#4ade80] border border-[#4ade80]/40 px-10 py-4 rounded-full flex items-center gap-3 shadow-[0_0_20px_rgba(74,222,128,0.2)] green-glow">
+                            <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">verified</span>
+                            <span class="font-display-lg text-headline-md font-bold tracking-tight">KLAIM VALID</span>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-glass-padding rounded-3xl cinematic-glow relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1.5 h-full bg-[#4ade80]"></div>
+                        <div class="flex flex-col gap-6">
+                            <div class="flex items-center gap-4">
+                                <span class="material-symbols-outlined text-secondary-container text-3xl">verified_user</span>
+                                <h3 class="font-headline-md text-headline-md text-on-surface">Ringkasan Analisis Medis</h3>
+                            </div>
+                            <div class="space-y-4 font-body-md text-body-md text-on-surface-variant leading-relaxed" id="valid-explanation-container">
+                                <p>Berdasarkan analisis mendalam menggunakan mesin kebenaran bertenaga AI dan verifikasi pakar, klaim ini dinyatakan <strong class="text-secondary-container">Valid</strong>. Konsensus ilmiah internasional dari organisasi kesehatan terkemuka secara konsisten mendukung fakta klinis ini.</p>
+                                <p>Studi epidemiologi kohort jangka panjang mengonfirmasi bahwa pola makan seimbang yang kaya serat memiliki dampak langsung pada metabolisme tubuh, membantu mengatur penyerapan zat gizi, dan secara signifikan memperkecil risiko gangguan pembuluh darah serta diabetes tipe 2.</p>
+                                <div class="pt-4 border-t border-white/10">
+                                    <p class="font-accent-italic text-accent-italic text-secondary-container border-l-2 border-secondary-container pl-4">
+                                        "Integrasi antara data klinis jangka panjang dan konsensus ahli mengonfirmasi kredibilitas informasi ini sebagai panduan kesehatan yang dapat dipercaya."
+                                        <span class="block mt-2 font-bold text-xs font-label-caps text-on-surface-variant uppercase tracking-wider">— Panel Konsensus Ikatan Dokter Indonesia (IDI).</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Facts Block -->
+                <div id="facts-block" class="hidden glass-panel p-glass-padding rounded-3xl">
+                    <div class="flex items-center gap-4 mb-6">
+                        <h2 class="font-headline-md text-headline-md text-secondary">Fakta Pendukung</h2>
+                        <div class="h-px bg-gradient-to-r from-secondary/30 to-transparent flex-1"></div>
+                    </div>
+                    <ul class="space-y-3 font-body-md text-body-md text-on-surface-variant leading-relaxed list-disc pl-5" id="facts-list">
+                        <!-- Loaded dynamically -->
+                    </ul>
+                </div>
+
+                <!-- Trusted Sources Shared Block -->
+                <div class="glass-panel p-glass-padding rounded-3xl">
+                    <div class="flex items-center gap-4 mb-6">
+                        <h2 class="font-headline-md text-headline-md text-secondary">Rujukan Sumber Kredibel</h2>
+                        <div class="h-px bg-gradient-to-r from-secondary/30 to-transparent flex-1"></div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4" id="trusted-sources-container">
+                        <a href="https://www.who.int" target="_blank" class="glass-panel px-6 py-4 rounded-xl flex items-center justify-between group hover:-translate-y-1">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-secondary">menu_book</span>
+                                <span class="font-bold text-sm text-white">WHO Portal</span>
+                            </div>
+                            <span class="material-symbols-outlined text-xs text-on-surface-variant group-hover:text-secondary group-hover:translate-x-1 transition-all">arrow_forward</span>
+                        </a>
+                        <a href="https://www.thelancet.com" target="_blank" class="glass-panel px-6 py-4 rounded-xl flex items-center justify-between group hover:-translate-y-1">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-secondary">clinical_notes</span>
+                                <span class="font-bold text-sm text-white">The Lancet</span>
+                            </div>
+                            <span class="material-symbols-outlined text-xs text-on-surface-variant group-hover:text-secondary group-hover:translate-x-1 transition-all">arrow_forward</span>
+                        </a>
+                        <a href="https://kemkes.go.id" target="_blank" class="glass-panel px-6 py-4 rounded-xl flex items-center justify-between group hover:-translate-y-1">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-secondary">health_and_safety</span>
+                                <span class="font-bold text-sm text-white">Kemenkes RI</span>
+                            </div>
+                            <span class="material-symbols-outlined text-xs text-on-surface-variant group-hover:text-secondary group-hover:translate-x-1 transition-all">arrow_forward</span>
+                        </a>
+                        <a href="https://www.nature.com" target="_blank" class="glass-panel px-6 py-4 rounded-xl flex items-center justify-between group hover:-translate-y-1">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-secondary">description</span>
+                                <span class="font-bold text-sm text-white">Nature Medicine</span>
+                            </div>
+                            <span class="material-symbols-outlined text-xs text-on-surface-variant group-hover:text-secondary group-hover:translate-x-1 transition-all">arrow_forward</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ============================================== -->
+        <!-- SECTION 2: DASHBOARD ANALISIS -->
+        <!-- ============================================== -->
+        <section id="page-dashboard" class="page-section px-container-padding pb-section-gap max-w-6xl mx-auto hidden">
+            
+            <!-- Dashboard Title Header -->
+            <header class="mb-10 max-w-4xl">
+                <h1 class="font-display-lg text-display-lg-mobile md:text-display-lg text-white mb-4">Dashboard Analisis Data</h1>
+                <p class="font-accent-italic text-accent-italic text-on-surface-variant max-w-2xl leading-relaxed">
+                    Wawasan data presisi yang ditarik dari pipeline verifikasi klaim medis dan pemrosesan jaringan AI. Amati sebaran fidusier pada metrik layanan.
+                </p>
+            </header>
+
+            <!-- Grid Layout (Bento Grid) -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+                
+                <!-- Card 1: Distribusi Kelas (Left Panel) -->
+                <div class="md:col-span-4 glass-panel rounded-3xl p-glass-padding flex flex-col h-full min-h-[420px]">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <h3 class="font-headline-md text-lg text-primary mb-1">Distribusi Kelas</h3>
+                            <p class="font-label-caps text-xs text-on-surface-variant uppercase tracking-wider">Label Balance Metrics</p>
+                        </div>
+                        <span class="material-symbols-outlined text-secondary-container text-2xl">pie_chart</span>
+                    </div>
+
+                    <!-- Interactive Bar Chart -->
+                    <div class="flex-1 flex flex-col justify-between py-4">
+                        <div class="relative h-44 w-full flex items-end justify-around pb-6 pt-4">
+                            <!-- Visual Dynamic SVG Bar Chart -->
+                            <div class="relative w-12 flex flex-col items-center group cursor-pointer h-full justify-end">
+                                <span class="text-xs font-bold text-primary mb-2 opacity-0 group-hover:opacity-100 transition-opacity" id="label-bar-valid">52%</span>
+                                <div class="w-full bg-primary-container/30 border border-primary/50 rounded-t-xl transition-all duration-700 select-none group-hover:bg-primary-container/50 group-hover:shadow-[0_0_20px_rgba(0,82,255,0.4)]" style="height: 52%;" id="bar-valid"></div>
+                                <span class="text-[10px] text-on-surface-variant mt-2 font-label-caps">Valid</span>
+                            </div>
+                            <div class="relative w-12 flex flex-col items-center group cursor-pointer h-full justify-end">
+                                <span class="text-xs font-bold text-error mb-2 opacity-0 group-hover:opacity-100 transition-opacity" id="label-bar-hoax">28%</span>
+                                <div class="w-full bg-error-container/30 border border-error/50 rounded-t-xl transition-all duration-700 select-none group-hover:bg-error-container/50 group-hover:shadow-[0_0_20px_rgba(255,180,171,0.4)]" style="height: 28%;" id="bar-hoax"></div>
+                                <span class="text-[10px] text-on-surface-variant mt-2 font-label-caps">Hoax</span>
+                            </div>
+                            <div class="relative w-12 flex flex-col items-center group cursor-pointer h-full justify-end">
+                                <span class="text-xs font-bold text-secondary-container mb-2 opacity-0 group-hover:opacity-100 transition-opacity" id="label-bar-suspicious">20%</span>
+                                <div class="w-full bg-secondary-container/20 border border-secondary-container/50 rounded-t-xl transition-all duration-700 select-none group-hover:bg-secondary-container/40 group-hover:shadow-[0_0_20px_rgba(0,224,255,0.4)]" style="height: 20%;" id="bar-suspicious"></div>
+                                <span class="text-[10px] text-on-surface-variant mt-2 font-label-caps">Suspicious</span>
+                            </div>
+                        </div>
+
+                        <!-- Statistics Details -->
+                        <div class="space-y-3 mt-4">
+                            <div class="flex justify-between items-center px-4 py-2.5 bg-white/5 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+                                <span class="text-sm text-on-surface-variant">Claims Terverifikasi Valid</span>
+                                <span class="font-bold text-primary" id="num-valid">1,575</span>
+                            </div>
+                            <div class="flex justify-between items-center px-4 py-2.5 bg-white/5 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+                                <span class="text-sm text-on-surface-variant">Claims Terdeteksi Hoax</span>
+                                <span class="font-bold text-error" id="num-hoax">848</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Metrik Dashboard (Right Panel) -->
+                <div class="md:col-span-8 glass-panel rounded-3xl p-glass-padding flex flex-col h-full justify-between">
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h3 class="font-headline-md text-lg text-primary mb-1">Statistik Deskriptif</h3>
+                            <p class="font-label-caps text-xs text-on-surface-variant uppercase tracking-wider">Aggregated Claim Intelligence</p>
+                        </div>
+                        <!-- Daily / Monthly Filter Toggle Switch -->
+                        <div class="flex bg-white/5 border border-white/10 rounded-full p-1 shadow-[inset_0_1px_3px_rgba(0,0,0,0.5)]">
+                            <button id="toggle-daily" class="px-4 py-1.5 text-[10px] uppercase font-bold tracking-widest bg-primary-container text-white rounded-full transition-all cursor-pointer" onclick="toggleMetricFilter('daily')">Harian</button>
+                            <button id="toggle-monthly" class="px-4 py-1.5 text-[10px] uppercase font-bold tracking-widest text-on-surface-variant hover:text-white rounded-full transition-all cursor-pointer" onclick="toggleMetricFilter('monthly')">Bulanan</button>
+                        </div>
+                    </div>
+
+                    <!-- Summary KPI Numbers -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+                        <div class="p-5 bg-white/5 rounded-2xl border border-white/5 hover:border-secondary-container/40 transition-all group">
+                            <p class="text-on-surface-variant text-xs font-label-caps uppercase tracking-wider mb-2">Mean Processing</p>
+                            <h4 class="text-3xl font-bold text-white group-hover:text-secondary-container transition-colors" id="kpi-mean">842 ms</h4>
+                            <div class="mt-4 h-1 w-full bg-white/10 rounded-full overflow-hidden">
+                                <div class="h-full bg-secondary-container w-[80%] cyan-glow transition-all duration-700" id="progress-mean"></div>
+                            </div>
+                        </div>
+                        <div class="p-5 bg-white/5 rounded-2xl border border-white/5 hover:border-primary/40 transition-all group">
+                            <p class="text-on-surface-variant text-xs font-label-caps uppercase tracking-wider mb-2">F1 Confidence</p>
+                            <h4 class="text-3xl font-bold text-white group-hover:text-primary transition-colors" id="kpi-confidence">98.2%</h4>
+                            <div class="mt-4 h-1 w-full bg-white/10 rounded-full overflow-hidden">
+                                <div class="h-full bg-primary w-[98%] cinematic-glow transition-all duration-700" id="progress-confidence"></div>
+                            </div>
+                        </div>
+                        <div class="p-5 bg-white/5 rounded-2xl border border-white/5 hover:border-error/40 transition-all group">
+                            <p class="text-on-surface-variant text-xs font-label-caps uppercase tracking-wider mb-2">Anomaly Rate</p>
+                            <h4 class="text-3xl font-bold text-white group-hover:text-error transition-colors" id="kpi-anomaly">1.4%</h4>
+                            <div class="mt-4 h-1 w-full bg-white/10 rounded-full overflow-hidden">
+                                <div class="h-full bg-error w-[14%] coral-glow transition-all duration-700" id="progress-anomaly"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Line Chart Visualizer (SVG-based dynamic graph) -->
+                    <div class="p-4 bg-white/5 rounded-2xl border border-white/5 flex flex-col justify-end relative group">
+                        <div class="flex justify-between items-center mb-2 px-1">
+                            <span class="text-[10px] text-on-surface-variant font-label-caps uppercase tracking-wider">Fidelity Trend Over Time</span>
+                            <span class="text-xs font-bold text-secondary-container" id="chart-status-text">STATUS: STABIL</span>
+                        </div>
+                        
+                        <!-- High Fidelity Responsive SVG Chart -->
+                        <div class="h-44 w-full relative">
+                            <svg viewBox="0 0 600 150" class="w-full h-full" id="svg-trend-chart">
+                                <!-- Gradients -->
+                                <defs>
+                                    <linearGradient id="chart-glow" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#00e0ff" stop-opacity="0.3"/>
+                                        <stop offset="100%" stop-color="#00e0ff" stop-opacity="0"/>
+                                    </linearGradient>
+                                </defs>
+                                <!-- Grid Lines -->
+                                <line x1="0" y1="30" x2="600" y2="30" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4"/>
+                                <line x1="0" y1="75" x2="600" y2="75" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4"/>
+                                <line x1="0" y1="120" x2="600" y2="120" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4"/>
+                                
+                                <!-- Filled Area Path (will be animated via JS) -->
+                                <path d="M 0 150 Q 100 100, 200 110 T 400 60 T 600 40 L 600 150 Z" fill="url(#chart-glow)" id="chart-area-path" class="transition-all duration-700"></path>
+                                <!-- Line Path -->
+                                <path d="M 0 150 Q 100 100, 200 110 T 400 60 T 600 40" fill="none" stroke="#00e0ff" stroke-width="2.5" id="chart-line-path" class="transition-all duration-700" style="filter: drop-shadow(0px 0px 8px rgba(0,224,255,0.5));"></path>
+                                
+                                <!-- Interactive Hover Dots -->
+                                <g id="chart-dots"></g>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Distribusi Panjang Karakter (Character Length) -->
+                <div class="md:col-span-12 glass-panel rounded-3xl p-glass-padding">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+                        <div>
+                            <h3 class="font-headline-md text-lg text-primary mb-1">Distribusi Panjang Karakter</h3>
+                            <p class="font-label-caps text-xs text-on-surface-variant uppercase tracking-wider">Linguistic Complexity Heatmap</p>
+                        </div>
+                        <div class="flex items-center gap-6">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 rounded-full bg-primary cinematic-glow"></div>
+                                <span class="text-xs text-on-surface-variant">Short Summary</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 rounded-full bg-secondary-container cyan-glow"></div>
+                                <span class="text-xs text-on-surface-variant">Extended Detail</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+                        <div class="h-60 w-full relative rounded-2xl overflow-hidden border border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
+                            <!-- Premium Abstract SVG mesh overlay representing data density -->
+                            <div class="absolute inset-0 bg-cover bg-center opacity-30" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCK5oRuocZtSkqQCyhMRRJIZJjG7eLeslaOmzu1ZAFIpAVm26zAjkKLO7xGoV6FzIDz1tgo9pTYOdYfTcjCflTanSGojfQKzjtvXhE_vunx_TIOZSFA5OMi_Q9qhekWB60tkzCG4DEGPQM8a7V-iXPnsSmRxyAKZ-qPJHGHtTw7XknWBrET7D95qbmu4R9I97_X8wqPXo3AIgBjgeKOItVUbOxXzb-r_9mfJUTWuomxNW97_YJHxeJ2')"></div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent"></div>
+                            <!-- Live scatter node nodes inside -->
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <span class="font-label-caps text-[10px] text-secondary tracking-widest bg-black/40 px-4 py-2 border border-white/10 rounded-full backdrop-blur-md">DENSITY GRADIENT MAP ACTIVE</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="p-6 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors">
+                                <h5 class="text-white font-bold text-md mb-2">Claim Length Correlation</h5>
+                                <p class="text-on-surface-variant text-sm mb-5 leading-relaxed">Pola data kami mengindikasikan bahwa klaim medis dengan jumlah karakter berkisar antara 1,200 sampai 2,500 cenderung memiliki validitas klinis lebih tinggi dibandingkan teks pendek yang bombastis.</p>
+                                <div class="flex gap-4">
+                                    <div class="flex-1">
+                                        <p class="text-[10px] text-on-surface-variant uppercase mb-1 font-label-caps tracking-wider">Min Length</p>
+                                        <p class="text-xl font-bold text-primary">120 Chars</p>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-[10px] text-on-surface-variant uppercase mb-1 font-label-caps tracking-wider">Max Length</p>
+                                        <p class="text-xl font-bold text-secondary-container">4,800 Chars</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-4">
+                                <button class="flex-1 py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all font-bold text-xs active:scale-95 text-white" onclick="alert('Dataset diperluas dengan metadata temporal.')">Perluas Dataset</button>
+                                <button class="flex-1 py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all font-bold text-xs active:scale-95 text-white" onclick="alert('Filter dinormalisasi ke standar WHO.')">Reset Filter</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer Action Block -->
+            <footer class="mt-16 flex flex-col items-center">
+                <div class="w-full max-w-4xl glass-panel rounded-[2rem] p-10 md:p-12 text-center relative overflow-hidden">
+                    <div class="absolute -top-24 -left-24 w-64 h-64 bg-primary/10 blur-[100px] pointer-events-none"></div>
+                    <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-secondary-container/10 blur-[100px] pointer-events-none"></div>
+                    
+                    <h2 class="font-display-lg text-display-lg-mobile md:text-3xl text-white mb-4">Siap untuk memvalidasi model?</h2>
+                    <p class="font-body-lg text-sm text-on-surface-variant mb-8 max-w-xl mx-auto leading-relaxed">
+                        Analisis eksplorasi mengonfirmasi tingkat kesiapan F1 model yang optimal. Mulai siklus pelatihan adaptif baru atau ekspor ringkasan verifikasi.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button class="group relative px-8 py-4 bg-primary-container text-white font-bold rounded-full cinematic-glow hover:scale-105 active:scale-95 transition-all overflow-hidden hover:shadow-[0_0_30px_rgba(0,82,255,0.6)] cursor-pointer" onclick="simulateModelTraining()">
+                            <span class="relative z-10 flex items-center gap-2 justify-center">
+                                Latih Model Sekarang
+                                <span class="material-symbols-outlined text-sm">rocket_launch</span>
+                            </span>
+                            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                        </button>
+                        <button class="px-8 py-4 glass-panel text-secondary font-bold rounded-full border border-white/20 hover:bg-white/10 active:scale-95 transition-all flex items-center gap-2 justify-center hover:shadow-[0_0_25px_rgba(0,224,255,0.4)] cursor-pointer" onclick="simulatePDFDownload()">
+                            Unduh Laporan PDF
+                            <span class="material-symbols-outlined text-sm" id="pdf-icon">download</span>
+                        </button>
+                    </div>
+                </div>
+            </footer>
+
+        </section>
+
+        <!-- ============================================== -->
+        <!-- SECTION 3: TENTANG KAMI -->
+        <!-- ============================================== -->
+        <section id="page-tentang" class="page-section px-container-padding max-w-5xl mx-auto hidden">
+            
+            <!-- Hero Header Section -->
+            <div class="relative min-h-[60vh] flex flex-col items-center justify-center text-center overflow-hidden mb-12 rounded-3xl p-8 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                <!-- Inner mesh background -->
+                <div class="absolute inset-0 -z-10 bg-cover bg-center opacity-25" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBl1mXhsRBdlawOsL3BnXw-GwPq_iib1LTVZJFWSmgDYC7_-LvT1bTnwl3tIDTESWGiFWyJXqG_c1v4URPpKbf0iDZTjA1VS8iqGnFaAvdfQoslJdqCvkrMyB9z7PfWWgIH2nij0lWvqg3Mva5nF-6x86LOYjuHDX24jVMVVXGuNYzrQqOfhXqYGTsBBj1RR21iVLJ8emQ3MLMoXzEb3H6ai_GdfTiVcmoHsewVMCkY1_tdu08P6WK4')"></div>
+                <div class="absolute inset-0 -z-10 bg-gradient-to-b from-[#101415]/40 via-[#101415]/90 to-[#101415]"></div>
+                
+                <span class="font-label-caps text-xs text-secondary tracking-[0.3em] mb-4 block uppercase animate-pulse">Visi & Misi Kami</span>
+                <h1 class="font-display-lg text-[44px] md:text-[64px] text-white mb-6 leading-none text-glow-primary">
+                    CekKlaim.id
+                </h1>
+                
+                <div class="glass-panel p-glass-padding rounded-2xl max-w-3xl mx-auto shadow-2xl">
+                    <p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed mb-0">
+                        Di era penyebaran informasi yang serba cepat, disinformasi medis merupakan ancaman langsung bagi keselamatan publik. CekKlaim.id hadir sebagai portal fact-checking independen bertenaga kecerdasan buatan, dirancang untuk mereduksi hoaks kesehatan secara komprehensif berdasarkan basis konsensus data medis tepercaya.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Core Project Goals -->
+            <div class="mb-16">
+                <div class="text-center mb-10">
+                    <h2 class="font-display-lg text-2xl md:text-3xl text-white mb-2">Tujuan Utama Proyek</h2>
+                    <p class="font-accent-italic text-accent-italic text-secondary text-sm">Menuju Ekosistem Informasi Kesehatan yang Presisi</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass-panel p-8 rounded-2xl group hover:bg-white/5 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-secondary/5 blur-[50px] -mr-16 -mt-16"></div>
+                        <div class="w-12 h-12 rounded-xl bg-secondary/15 flex items-center justify-center mb-6 border border-secondary/20">
+                            <span class="material-symbols-outlined text-secondary text-2xl">fact_check</span>
+                        </div>
+                        <h3 class="font-headline-md text-xl text-white mb-3">Fact-Checking Otomatis</h3>
+                        <p class="text-on-surface-variant text-sm leading-relaxed">Menggunakan model Natural Language Processing (NLP) yang dilatih khusus dengan referensi jurnal klinis untuk menilai kredibilitas informasi medis secara cepat dan akurat.</p>
+                    </div>
+                    
+                    <div class="glass-panel p-8 rounded-2xl group hover:bg-white/5 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-[50px] -mr-16 -mt-16"></div>
+                        <div class="w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center mb-6 border border-primary/20">
+                            <span class="material-symbols-outlined text-primary text-2xl">all_inclusive</span>
+                        </div>
+                        <h3 class="font-headline-md text-xl text-white mb-3">Workflow Kolaboratif</h3>
+                        <p class="text-on-surface-variant text-sm leading-relaxed">Menggabungkan deteksi anomali AI cerdas dengan alur validasi klinis sekunder dari panel dokter profesional untuk meminimalkan misklasifikasi.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dataset Summary Section -->
+            <div class="mb-12">
+                <div class="text-center mb-10">
+                    <h2 class="font-display-lg text-2xl md:text-3xl text-white mb-2">Ringkasan Dataset Medis</h2>
+                    <p class="font-body-lg text-sm text-on-surface-variant max-w-2xl mx-auto leading-relaxed">
+                        Data penilai model AI kami dikurasi dengan cermat dari ribuan jurnal terindeks Scopus dan pangkalan data referensi klinis global.
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="dataset-counters">
+                    <!-- Train Set -->
+                    <div class="glass-panel p-6 rounded-2xl border-t-2 border-t-secondary/50 flex flex-col justify-between">
+                        <span class="text-[10px] font-label-caps text-on-surface-variant uppercase tracking-wider block mb-4">TRAIN SET</span>
+                        <div class="flex items-baseline gap-2 mb-2">
+                            <span class="text-4xl font-extrabold text-white counter" data-target="2120">0</span>
+                            <span class="text-secondary text-xs font-bold font-label-caps">Samples</span>
+                        </div>
+                        <div class="h-1 w-full bg-surface-container rounded-full overflow-hidden">
+                            <div class="h-full bg-secondary w-[70%]"></div>
+                        </div>
+                    </div>
+                    <!-- Validasi -->
+                    <div class="glass-panel p-6 rounded-2xl border-t-2 border-t-primary/50 flex flex-col justify-between">
+                        <span class="text-[10px] font-label-caps text-on-surface-variant uppercase tracking-wider block mb-4">VALIDATION SET</span>
+                        <div class="flex items-baseline gap-2 mb-2">
+                            <span class="text-4xl font-extrabold text-white counter" data-target="454">0</span>
+                            <span class="text-primary text-xs font-bold font-label-caps">Samples</span>
+                        </div>
+                        <div class="h-1 w-full bg-surface-container rounded-full overflow-hidden">
+                            <div class="h-full bg-primary w-[15%]"></div>
+                        </div>
+                    </div>
+                    <!-- Test Set -->
+                    <div class="glass-panel p-6 rounded-2xl border-t-2 border-t-tertiary/50 flex flex-col justify-between">
+                        <span class="text-[10px] font-label-caps text-on-surface-variant uppercase tracking-wider block mb-4">TEST SET</span>
+                        <div class="flex items-baseline gap-2 mb-2">
+                            <span class="text-4xl font-extrabold text-white counter" data-target="455">0</span>
+                            <span class="text-tertiary text-xs font-bold font-label-caps">Samples</span>
+                        </div>
+                        <div class="h-1 w-full bg-surface-container rounded-full overflow-hidden">
+                            <div class="h-full bg-tertiary w-[15%]"></div>
+                        </div>
+                    </div>
+                    <!-- Total -->
+                    <div class="relative group">
+                        <div class="absolute -inset-0.5 bg-gradient-to-r from-secondary to-primary rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-700"></div>
+                        <div class="relative glass-panel p-6 rounded-2xl h-full flex flex-col justify-between bg-surface-container-low/60">
+                            <span class="text-[10px] font-label-caps text-secondary uppercase tracking-wider block mb-4">TOTAL DATASET</span>
+                            <div class="flex items-baseline gap-2 mb-2">
+                                <span class="text-5xl font-extrabold text-white tracking-tighter counter" data-target="3029">0</span>
+                            </div>
+                            <p class="text-[10px] text-on-surface-variant font-label-caps uppercase tracking-wider mt-1">Clinical Knowledge Base</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA Section -->
+            <div class="glass-panel p-10 md:p-14 rounded-3xl text-center relative overflow-hidden border-white/10 mt-16">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[120px] pointer-events-none"></div>
+                <div class="absolute bottom-0 left-0 w-64 h-64 bg-secondary/10 blur-[120px] pointer-events-none"></div>
+                
+                <h2 class="font-display-lg text-2xl md:text-3xl text-white mb-4">Jaga Diri Dari Misinformasi Kesehatan</h2>
+                <p class="text-sm text-on-surface-variant max-w-xl mx-auto mb-8 leading-relaxed">Integrasikan API CekKlaim.id ke dalam platform media sosial Anda untuk mendeteksi klaim palsu seketika.</p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button class="bg-primary hover:bg-primary-container text-white px-8 py-3.5 rounded-full font-bold shadow-[0_0_20px_rgba(0,82,255,0.3)] hover:scale-105 transition-all duration-300 cursor-pointer" onclick="showPage('cek-klaim')">
+                        Kembali Ke Verifikasi
+                    </button>
+                    <button class="bg-white/5 border border-white/20 backdrop-blur-md text-white px-8 py-3.5 rounded-full font-bold hover:bg-white/10 transition-all duration-300 cursor-pointer" onclick="showPage('dashboard')">
+                        Lihat Dashboard
+                    </button>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Shared Footer Navigation Details -->
+    <footer class="py-12 px-container-padding border-t border-white/10 bg-surface-container-low/40 backdrop-blur-md">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="flex flex-col gap-2 text-center md:text-left">
+                <span class="font-display-lg text-xl font-bold text-primary">CekKlaim.id</span>
+                <p class="text-on-surface-variant text-xs">© 2026 Precision Fact-Check for Global Health Integrity.</p>
+            </div>
+            <div class="flex flex-wrap justify-center gap-6 md:gap-8">
+                <a class="text-on-surface-variant hover:text-secondary transition-colors font-label-caps text-[10px] tracking-wider uppercase" href="#" onclick="alert('Privacy Policy Sim')">Privacy Policy</a>
+                <a class="text-on-surface-variant hover:text-secondary transition-colors font-label-caps text-[10px] tracking-wider uppercase" href="#" onclick="alert('Terms of Service Sim')">Terms of Service</a>
+                <a class="text-on-surface-variant hover:text-secondary transition-colors font-label-caps text-[10px] tracking-wider uppercase" href="#" onclick="alert('Contact Support Sim')">Contact Support</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- CONFIG / SETTINGS DIALOG MODAL -->
+    <div id="settings-modal" class="fixed inset-0 z-[100] flex items-center justify-center px-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-md" onclick="showConfigModal(false)"></div>
+        <div class="glass-panel max-w-md w-full rounded-3xl p-8 relative z-10 scale-95 transition-transform duration-300" id="settings-modal-card">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-headline-md text-xl text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-secondary">settings</span>
+                    Konfigurasi Modul AI
+                </h3>
+                <button class="text-on-surface-variant hover:text-white" onclick="showConfigModal(false)">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-xs font-label-caps text-on-surface-variant uppercase tracking-wider mb-2">Ambang Batas Kepercayaan (Confidence Threshold)</label>
+                    <div class="flex items-center gap-4">
+                        <input type="range" min="50" max="100" value="85" class="flex-1 bg-white/10 rounded-lg appearance-none h-1.5 accent-secondary" id="range-threshold" oninput="document.getElementById('threshold-val').innerText = this.value + '%'">
+                        <span class="font-bold text-secondary text-sm font-mono" id="threshold-val">85%</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-label-caps text-on-surface-variant uppercase tracking-wider mb-2">Model Pemrosesan Bahasa (NLP Model)</label>
+                    <select class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-secondary transition-colors">
+                        <option value="clin-3.5" class="bg-[#101415]">v3.5-Precision Clinical (Default)</option>
+                        <option value="gen-2.0" class="bg-[#101415]">v2.0-General Semantic Fast</option>
+                        <option value="ensemble" class="bg-[#101415]">v4.0-Ensemble Consensus</option>
+                    </select>
+                </div>
+                <div class="flex gap-4">
+                    <button class="flex-1 py-3 bg-primary-container text-white font-bold rounded-xl active:scale-95 transition-all text-xs" onclick="showConfigModal(false); alert('Pengaturan konfigurasi NLP disimpan.')">Simpan Perubahan</button>
+                    <button class="flex-1 py-3 bg-white/5 border border-white/10 text-white rounded-xl active:scale-95 transition-all text-xs" onclick="showConfigModal(false)">Batal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLIENT SIDE JS CONTROL LOGIC -->
+    <script>
+        // UI State variables
+
+        // 1. Interactive Cursor Follow Glow
+        const cursorGlow = document.getElementById('cursor-glow');
+        let isMouseActive = false;
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isMouseActive) {
+                cursorGlow.classList.remove('opacity-0');
+                isMouseActive = true;
+            }
+            cursorGlow.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+        });
+
+        document.addEventListener('mouseleave', () => {
+            cursorGlow.classList.add('opacity-0');
+            isMouseActive = false;
+        });
+
+        // 2. SPA Tab Router
+        function showPage(pageId) {
+            // Hide all pages with animation classes
+            const sections = document.querySelectorAll('.page-section');
+            sections.forEach(sec => {
+                sec.classList.add('hidden');
+            });
+            
+            // Show target page
+            const targetSection = document.getElementById('page-' + pageId);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+                // Force a small reflow to trigger anims
+                void targetSection.offsetWidth;
+            }
+
+            // Update desktop navigation header link styles
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('data-page') === pageId) {
+                    link.classList.add('nav-link-active');
+                    link.classList.remove('text-on-surface-variant');
+                } else {
+                    link.classList.remove('nav-link-active');
+                    link.classList.add('text-on-surface-variant');
+                }
+            });
+
+            // Update mobile navigation link styles
+            document.querySelectorAll('.mobile-nav-link').forEach(link => {
+                if (link.getAttribute('data-page') === pageId) {
+                    link.classList.add('text-primary');
+                    link.classList.remove('text-on-surface-variant');
+                } else {
+                    link.classList.remove('text-primary');
+                    link.classList.add('text-on-surface-variant');
+                }
+            });
+
+            // Trigger animations depending on the loaded page
+            if (pageId === 'tentang') {
+                triggerCounters();
+            } else if (pageId === 'dashboard') {
+                animateDashboardOnLoad();
+            }
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+
+        // 4. Futuristic Scanning Simulation Pipeline
+        let statsData = null;
+        async function fetchStats() {
+            if (statsData) return statsData;
+            try {
+                const res = await fetch('/api/stats');
+                statsData = await res.json();
+                return statsData;
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        let statsLoaded = false;
+        async function loadStatsCounters() {
+            if (statsLoaded) return;
+            const apiStats = await fetchStats();
+            if (apiStats) {
+                const counters = document.querySelectorAll('.counter');
+                if (counters.length >= 4) {
+                    counters[0].setAttribute('data-target', apiStats.train_size);
+                    counters[1].setAttribute('data-target', apiStats.val_size);
+                    counters[2].setAttribute('data-target', apiStats.test_size);
+                    counters[3].setAttribute('data-target', apiStats.total_size);
+                }
+                statsLoaded = true;
+            }
+        }
+
+        function runAnalysis() {
+            const claimText = document.getElementById('claim-input').value.trim();
+            if (!claimText) {
+                alert('Tolong ketik klaim kesehatan terlebih dahulu.');
+                return;
+            }
+
+            const loader = document.getElementById('analysis-loader');
+            const resultBox = document.getElementById('analysis-result-container');
+            const scanBar = document.getElementById('scanning-line');
+            const btn = document.getElementById('btn-analyse');
+            const statusLog = document.getElementById('loader-status');
+
+            // Hide old results
+            resultBox.classList.add('hidden');
+            document.getElementById('result-hoax').classList.add('hidden');
+            document.getElementById('result-valid').classList.add('hidden');
+            document.getElementById('facts-block').classList.add('hidden');
+
+            // Show loader and animate scan bar
+            loader.classList.remove('hidden');
+            scanBar.classList.remove('hidden');
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+
+            // Simulated logger timeline
+            const logs = [
+                "Membuka socket koneksi basis data klinis...",
+                "Melakukan parser sintaksis dengan NLP pipeline...",
+                "Membandingkan referensi konsensus WHO & CDC...",
+                "Mengevaluasi tingkat kebenaran data empiris...",
+                "Menghitung probabilitas keakuratan..."
+            ];
+
+            let logIndex = 0;
+            const logInterval = setInterval(() => {
+                if (logIndex < logs.length) {
+                    statusLog.innerText = logs[logIndex];
+                    logIndex++;
+                }
+            }, 350);
+
+            // Timer promise (2000ms)
+            const timerPromise = new Promise(resolve => setTimeout(resolve, 2000));
+
+            // API fetch promise
+            const apiPromise = fetch('/api/analyse', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: claimText })
+            }).then(res => res.json());
+
+            Promise.all([timerPromise, apiPromise])
+                .then(([_, data]) => {
+                    clearInterval(logInterval);
+                    loader.classList.add('hidden');
+                    scanBar.classList.add('hidden');
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50');
+
+                    if (data && data.verdict) {
+                        renderResults(data);
+                    } else {
+                        alert('Terjadi kesalahan saat menghubungi API analisis.');
+                    }
+                })
+                .catch(err => {
+                    clearInterval(logInterval);
+                    loader.classList.add('hidden');
+                    scanBar.classList.add('hidden');
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50');
+                    console.error(err);
+                    alert('Gagal terhubung dengan server API.');
+                });
+        }
+
+        function renderResults(data) {
+            const container = document.getElementById('analysis-result-container');
+            const hoaxBox = document.getElementById('result-hoax');
+            const validBox = document.getElementById('result-valid');
+            const factsBlock = document.getElementById('facts-block');
+
+            container.classList.remove('hidden');
+
+            const verdict = data.verdict.toUpperCase();
+            if (verdict === 'VALID') {
+                validBox.classList.remove('hidden');
+                hoaxBox.classList.add('hidden');
+                document.getElementById('valid-explanation-container').innerHTML = `
+                    <p>${data.penjelasan}</p>
+                    <div class="pt-4 border-t border-white/10">
+                        <p class="font-accent-italic text-accent-italic text-secondary-container border-l-2 border-secondary-container pl-4">
+                            "Selalu konsultasikan dengan tenaga medis profesional sebelum mengambil keputusan medis."
+                            <span class="block mt-2 font-bold text-xs font-label-caps text-on-surface-variant uppercase tracking-wider">— Catatan Keselamatan Medis</span>
+                        </p>
+                    </div>
+                `;
+            } else {
+                // HOAKS or TIDAK PASTI
+                hoaxBox.classList.remove('hidden');
+                validBox.classList.add('hidden');
+                
+                let titleText = 'HOAX / TIDAK VALID';
+                let accentColorClass = 'text-error';
+                let borderColorClass = 'border-error/30';
+                let bgContainerClass = 'bg-error-container/20';
+                
+                if (verdict === 'TIDAK PASTI') {
+                    titleText = `TIDAK PASTI (${Math.round(data.confidence * 100)}%)`;
+                    accentColorClass = 'text-[#ffd28a]';
+                    borderColorClass = 'border-[#ffd28a]/20';
+                    bgContainerClass = 'bg-[#ffd28a]/10';
+                }
+                
+                const badge = hoaxBox.querySelector('.flex.justify-center > div');
+                badge.className = `${bgContainerClass} ${accentColorClass} border ${borderColorClass} px-10 py-4 rounded-full flex items-center gap-3 animate-pulse coral-glow`;
+                badge.querySelector('span.font-display-lg').innerText = titleText;
+                badge.querySelector('span.material-symbols-outlined').innerText = verdict === 'TIDAK PASTI' ? 'help' : 'error';
+
+                document.getElementById('hoax-explanation-container').innerHTML = `
+                    <p>${data.penjelasan}</p>
+                    <div class="pt-4 border-t border-white/10">
+                        <p class="font-accent-italic text-accent-italic text-primary border-l-2 border-primary pl-4">
+                            "Klaim penyembuhan instan tanpa protokol medis terstandarisasi adalah ciri khas penipuan kesehatan yang dapat berakibat fatal bagi pasien."
+                            <span class="block mt-2 font-bold text-xs font-label-caps text-on-surface-variant uppercase tracking-wider">— Catatan Keselamatan Medis</span>
+                        </p>
+                    </div>
+                `;
+            }
+
+            // Facts list
+            if (data.fakta && data.fakta.length > 0) {
+                factsBlock.classList.remove('hidden');
+                let factsHtml = '';
+                data.fakta.forEach(f => {
+                    factsHtml += `
+                    <li class="flex items-start gap-3 text-sm text-on-surface-variant leading-relaxed">
+                        <span class="text-secondary mt-1">▸</span>
+                        <span>${f}</span>
+                    </li>`;
+                });
+                document.getElementById('facts-list').innerHTML = factsHtml;
+            } else {
+                factsBlock.classList.add('hidden');
+            }
+
+            // Sources list
+            if (data.sumber && data.sumber.length > 0) {
+                let sourcesHtml = '';
+                data.sumber.forEach(s => {
+                    const url = s.toLowerCase().includes('who') ? 'https://www.who.int' :
+                                s.toLowerCase().includes('kemenkes') ? 'https://kemkes.go.id' :
+                                s.toLowerCase().includes('lancet') ? 'https://www.thelancet.com' :
+                                s.toLowerCase().includes('nature') ? 'https://www.nature.com' : '#';
+                    sourcesHtml += `
+                    <a href="${url}" target="_blank" class="glass-panel px-6 py-4 rounded-xl flex items-center justify-between group hover:-translate-y-1">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-secondary">menu_book</span>
+                            <span class="font-bold text-sm text-white">${s}</span>
+                        </div>
+                        <span class="material-symbols-outlined text-xs text-on-surface-variant group-hover:text-secondary group-hover:translate-x-1 transition-all">arrow_forward</span>
+                    </a>`;
+                });
+                document.getElementById('trusted-sources-container').innerHTML = sourcesHtml;
+            }
+
+            // Scroll down to results smoothly
+            setTimeout(() => {
+                container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        // Display outcome states (Valid vs Hoax)
+        function showResultState(state) {
+            const mockData = {
+                verdict: state,
+                penjelasan: state === 'valid' ?
+                    "Ini adalah simulasi klaim kesehatan VALID. Konsumsi asupan serat pangan terbukti secara klinis berkontribusi menurunkan risiko penyakit jantung." :
+                    "Ini adalah simulasi klaim kesehatan HOAKS. Bawang putih mentah tidak terbukti secara klinis menyembuhkan tumor dalam hitungan jam.",
+                fakta: [
+                    "Berdasarkan literatur medis, nutrisi seimbang berkontribusi besar bagi kesehatan.",
+                    "Konsensus klinis menyatakan informasi ini harus diimbangi dengan konsultasi medis."
+                ],
+                sumber: ["WHO Portal", "Kemenkes RI"]
+            };
+            renderResults(mockData);
+        }
+
+        // 5. Dashboard Data & SVG Chart Control Logic
+        const dashboardData = {
+            daily: {
+                mean: "842 ms",
+                confidence: "98.2%",
+                anomaly: "1.4%",
+                validNum: "1,575",
+                hoaxNum: "848",
+                validPct: 52,
+                hoaxPct: 28,
+                suspPct: 20,
+                trendPath: "M 0 120 C 100 90, 150 110, 250 50 S 450 80, 600 30",
+                trendArea: "M 0 120 C 100 90, 150 110, 250 50 S 450 80, 600 30 L 600 150 L 0 150 Z",
+                statusText: "STATUS: STABIL (HARIAN)",
+                points: [
+                    {x: 50, y: 110, val: "Fidelity: 92%"},
+                    {x: 150, y: 100, val: "Fidelity: 93%"},
+                    {x: 250, y: 50, val: "Fidelity: 97%"},
+                    {x: 350, y: 70, val: "Fidelity: 95%"},
+                    {x: 480, y: 65, val: "Fidelity: 96%"},
+                    {x: 580, y: 30, val: "Fidelity: 98%"}
+                ]
+            },
+            monthly: {
+                mean: "24,510 ms",
+                confidence: "99.4%",
+                anomaly: "0.8%",
+                validNum: "48,930",
+                hoaxNum: "25,120",
+                validPct: 59,
+                hoaxPct: 25,
+                suspPct: 16,
+                trendPath: "M 0 140 C 120 120, 180 80, 300 40 S 480 30, 600 15",
+                trendArea: "M 0 140 C 120 120, 180 80, 300 40 S 480 30, 600 15 L 600 150 L 0 150 Z",
+                statusText: "STATUS: MENINGKAT (BULANAN)",
+                points: [
+                    {x: 60, y: 135, val: "Fidelity: 90%"},
+                    {x: 180, y: 95, val: "Fidelity: 94%"},
+                    {x: 300, y: 40, val: "Fidelity: 98%"},
+                    {x: 450, y: 32, val: "Fidelity: 99%"},
+                    {x: 570, y: 15, val: "Fidelity: 99.4%"}
+                ]
+            }
+        };
+
+        async function toggleMetricFilter(range) {
+            const btnDaily = document.getElementById('toggle-daily');
+            const btnMonthly = document.getElementById('toggle-monthly');
+
+            // Visual tab selection toggle
+            if (range === 'daily') {
+                btnDaily.classList.add('bg-primary-container', 'text-white');
+                btnDaily.classList.remove('text-on-surface-variant', 'hover:text-white');
+                btnMonthly.classList.remove('bg-primary-container', 'text-white');
+                btnMonthly.classList.add('text-on-surface-variant', 'hover:text-white');
+            } else {
+                btnMonthly.classList.add('bg-primary-container', 'text-white');
+                btnMonthly.classList.remove('text-on-surface-variant', 'hover:text-white');
+                btnDaily.classList.remove('bg-primary-container', 'text-white');
+                btnDaily.classList.add('text-on-surface-variant', 'hover:text-white');
+            }
+
+            // Update statistics KPI card values
+            const data = dashboardData[range];
+            const apiStats = await fetchStats();
+            if (apiStats) {
+                document.getElementById('kpi-mean').innerText = range === 'daily' ? `${apiStats.mean_processing_ms} ms` : data.mean;
+                document.getElementById('kpi-confidence').innerText = apiStats.confidence_f1;
+                document.getElementById('kpi-anomaly').innerText = apiStats.anomaly_rate;
+
+                const scalar = range === 'daily' ? 1 : 20;
+                document.getElementById('num-valid').innerText = (apiStats.valid_count * scalar).toLocaleString('id-ID');
+                document.getElementById('num-hoax').innerText = (apiStats.hoax_count * scalar).toLocaleString('id-ID');
+
+                const total = apiStats.valid_count + apiStats.hoax_count;
+                const validPct = Math.round((apiStats.valid_count / total) * 100);
+                const hoaxPct = Math.round((apiStats.hoax_count / total) * 100);
+                const suspPct = 100 - validPct - hoaxPct;
+
+                animateBar('bar-valid', 'label-bar-valid', validPct);
+                animateBar('bar-hoax', 'label-bar-hoax', hoaxPct);
+                animateBar('bar-suspicious', 'label-bar-suspicious', suspPct);
+            } else {
+                document.getElementById('kpi-mean').innerText = data.mean;
+                document.getElementById('kpi-confidence').innerText = data.confidence;
+                document.getElementById('kpi-anomaly').innerText = data.anomaly;
+
+                document.getElementById('num-valid').innerText = data.validNum;
+                document.getElementById('num-hoax').innerText = data.hoaxNum;
+
+                animateBar('bar-valid', 'label-bar-valid', data.validPct);
+                animateBar('bar-hoax', 'label-bar-hoax', data.hoaxPct);
+                animateBar('bar-suspicious', 'label-bar-suspicious', data.suspPct);
+            }
+
+            // Redraw trend paths & circles inside SVG chart
+            document.getElementById('chart-line-path').setAttribute('d', data.trendPath);
+            document.getElementById('chart-area-path').setAttribute('d', data.trendArea);
+            document.getElementById('chart-status-text').innerText = data.statusText;
+
+            // Redraw tooltip points
+            const dotsGroup = document.getElementById('chart-dots');
+            dotsGroup.innerHTML = '';
+            
+            data.points.forEach(pt => {
+                const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                g.setAttribute("class", "cursor-pointer group/dot");
+                
+                const circleGlow = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circleGlow.setAttribute("cx", pt.x);
+                circleGlow.setAttribute("cy", pt.y);
+                circleGlow.setAttribute("r", 8);
+                circleGlow.setAttribute("fill", "#00e0ff");
+                circleGlow.setAttribute("opacity", "0");
+                circleGlow.setAttribute("class", "hover:opacity-30 transition-opacity duration-300");
+
+                const circleDot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circleDot.setAttribute("cx", pt.x);
+                circleDot.setAttribute("cy", pt.y);
+                circleDot.setAttribute("r", 4);
+                circleDot.setAttribute("fill", "#ffffff");
+                circleDot.setAttribute("stroke", "#00e0ff");
+                circleDot.setAttribute("stroke-width", "2");
+
+                g.appendChild(circleGlow);
+                g.appendChild(circleDot);
+                
+                // Tooltip binding hover trigger
+                g.addEventListener('mouseenter', (evt) => {
+                    showChartTooltip(pt.x, pt.y, pt.val, evt);
+                });
+                g.addEventListener('mouseleave', () => {
+                    hideChartTooltip();
+                });
+
+                dotsGroup.appendChild(g);
+            });
+        }
+
+        // Animate individual progress bar heights
+        function animateBar(barId, labelId, percent) {
+            const bar = document.getElementById(barId);
+            const label = document.getElementById(labelId);
+            bar.style.height = percent + '%';
+            label.innerText = percent + '%';
+        }
+
+        // Draw dynamic tooltip elements overlay
+        let activeTooltip = null;
+        function showChartTooltip(x, y, text, event) {
+            hideChartTooltip();
+            const svg = document.getElementById('svg-trend-chart');
+            const rect = svg.getBoundingClientRect();
+
+            // Create glassmorphic div bubble
+            const tip = document.createElement('div');
+            tip.className = 'absolute bg-surface-container/90 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-lg text-xs font-bold text-secondary-container z-30 pointer-events-none shadow-xl';
+            tip.innerText = text;
+            
+            // Coordinate calibration
+            const svgX = (x / 600) * rect.width;
+            const svgY = (y / 150) * rect.height;
+
+            tip.style.left = (svgX + 10) + 'px';
+            tip.style.top = (svgY - 35) + 'px';
+
+            svg.parentElement.appendChild(tip);
+            activeTooltip = tip;
+        }
+
+        function hideChartTooltip() {
+            if (activeTooltip) {
+                activeTooltip.remove();
+                activeTooltip = null;
+            }
+        }
+
+        function animateDashboardOnLoad() {
+            // Default load state triggers
+            toggleMetricFilter('daily');
+        }
+
+        // 6. Dataset Counter Animations logic (Scroll triggered)
+        let countersRan = false;
+        
+        async function triggerCounters() {
+            if (countersRan) return;
+            await loadStatsCounters();
+            countersRan = true;
+
+            const counters = document.querySelectorAll('.counter');
+            const speed = 100; // Counter progression divisor
+
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                let count = 0;
+                
+                const increment = Math.ceil(target / speed);
+                
+                const updateCounter = () => {
+                    count += increment;
+                    if (count < target) {
+                        counter.innerText = count.toLocaleString('id-ID');
+                        setTimeout(updateCounter, 10);
+                    } else {
+                        counter.innerText = target.toLocaleString('id-ID');
+                    }
+                };
+                
+                updateCounter();
+            });
+        }
+
+        // Scroll listener to auto-start counters when Tentang Kami is scrolled
+        window.addEventListener('scroll', () => {
+            const datasetSection = document.getElementById('dataset-counters');
+            const tentangPage = document.getElementById('page-tentang');
+            
+            if (datasetSection && !tentangPage.classList.contains('hidden') && !countersRan) {
+                const rect = datasetSection.getBoundingClientRect();
+                const viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
+                
+                if (rect.top <= viewHeight && rect.bottom >= 0) {
+                    triggerCounters();
+                }
+            }
+        });
+
+        // 7. Modals and Settings controls
+        function showConfigModal(show = true) {
+            const modal = document.getElementById('settings-modal');
+            const card = document.getElementById('settings-modal-card');
+            if (show) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    card.classList.remove('scale-95');
+                }, 50);
+            } else {
+                modal.classList.add('opacity-0');
+                card.classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        function toggleNotification(show = null) {
+            const toast = document.getElementById('notification-toast');
+            if (show === null) {
+                show = toast.classList.contains('hidden');
+            }
+
+            if (show) {
+                toast.classList.remove('hidden');
+                setTimeout(() => {
+                    toast.classList.remove('opacity-0', 'translate-y-[-10px]');
+                }, 50);
+            } else {
+                toast.classList.add('opacity-0', 'translate-y-[-10px]');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        // Simulated secondary CTA clicks
+        function simulateModelTraining() {
+            alert("Memulai siklus pelatihan mandiri AI... Model baru akan dimuat ke server verifikasi dalam waktu sekitar 5 menit.");
+        }
+
+        function simulatePDFDownload() {
+            const icon = document.getElementById('pdf-icon');
+            icon.innerText = 'sync';
+            icon.classList.add('animate-spin');
+
+            setTimeout(() => {
+                icon.innerText = 'check';
+                icon.classList.remove('animate-spin');
+                alert("Simulasi Unduhan Laporan Sukses: Laporan audit data CekKlaim_Report.pdf telah diunduh ke folder Downloads Anda.");
+                setTimeout(() => {
+                    icon.innerText = 'download';
+                }, 2000);
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

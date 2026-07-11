@@ -1,0 +1,392 @@
+<!DOCTYPE html><html class="dark" lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>CekKlaim.id | High-Fidelity Data Intelligence</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:ital,wght@0,400;1,400&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed-variant": "#414658",
+                    "surface-variant": "#323537",
+                    "background": "#101415",
+                    "on-secondary-container": "#005f6d",
+                    "error-container": "#93000a",
+                    "surface-dim": "#101415",
+                    "secondary-container": "#00e0ff",
+                    "surface-container-high": "#272a2c",
+                    "on-error": "#690005",
+                    "inverse-on-surface": "#2d3133",
+                    "surface-tint": "#b7c4ff",
+                    "secondary-fixed": "#a5eeff",
+                    "on-secondary": "#00363f",
+                    "on-tertiary-fixed": "#161b2b",
+                    "inverse-surface": "#e0e3e5",
+                    "on-surface": "#e0e3e5",
+                    "on-primary-fixed": "#001452",
+                    "tertiary-fixed": "#dee1f7",
+                    "surface-bright": "#363a3b",
+                    "on-error-container": "#ffdad6",
+                    "on-secondary-fixed-variant": "#004e5a",
+                    "tertiary-fixed-dim": "#c2c6db",
+                    "on-primary-fixed-variant": "#0038b6",
+                    "on-tertiary": "#2b3040",
+                    "surface-container-highest": "#323537",
+                    "tertiary-container": "#616578",
+                    "primary-fixed": "#dde1ff",
+                    "on-primary": "#002682",
+                    "outline-variant": "#434656",
+                    "secondary-fixed-dim": "#00daf8",
+                    "on-secondary-fixed": "#001f25",
+                    "on-tertiary-container": "#e0e3f9",
+                    "on-primary-container": "#dfe3ff",
+                    "primary": "#b7c4ff",
+                    "on-surface-variant": "#c3c5d9",
+                    "surface-container": "#1d2022",
+                    "surface-container-lowest": "#0b0f10",
+                    "outline": "#8d90a2",
+                    "primary-container": "#0052ff",
+                    "surface": "#101415",
+                    "tertiary": "#c2c6db",
+                    "secondary": "#b9f1ff",
+                    "inverse-primary": "#004ced",
+                    "surface-container-low": "#191c1e",
+                    "primary-fixed-dim": "#b7c4ff",
+                    "on-background": "#e0e3e5",
+                    "error": "#ffb4ab"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "element-gap": "24px",
+                    "container-padding": "40px",
+                    "section-gap": "80px",
+                    "unit": "8px",
+                    "glass-padding": "32px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Plus Jakarta Sans"],
+                    "body-md": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "display-lg-mobile": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "body-lg": ["Inter"],
+                    "accent-italic": ["\"Source Serif 4\""]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "accent-italic": ["16px", {"lineHeight": "1.5", "letterSpacing": "0.02em", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #101415;
+            color: #e0e3e5;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+        }
+        .cinematic-glow {
+            box-shadow: 0 0 20px rgba(0, 82, 255, 0.3);
+        }
+        .cyan-glow {
+            box-shadow: 0 0 15px rgba(0, 224, 255, 0.4);
+        }
+        .coral-glow {
+            box-shadow: 0 0 15px rgba(255, 180, 171, 0.4);
+        }
+        @keyframes subtle-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .float-animation {
+            animation: subtle-float 6s ease-in-out infinite;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .nav-link-active {
+            color: #b9f1ff; /* secondary */
+            border-bottom: 2px solid #b9f1ff;
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md antialiased">
+<!-- Cinematic Floor Background -->
+<div class="fixed inset-0 -z-10 bg-gradient-to-br from-background via-[#0a1220] to-background"></div>
+<!-- TopNavBar (Updated for consistency) -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-container-padding h-20 bg-surface/10 backdrop-blur-2xl border-b border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]">
+<div class="flex items-center gap-12">
+<span class="font-display-lg text-2xl font-bold text-primary tracking-tighter">CekKlaim.id</span>
+<div class="hidden md:flex gap-8">
+<a class="text-on-surface-variant hover:text-white transition-colors h-20 flex items-center px-1 font-medium active:scale-95" href="#">Tentang Kami</a>
+<a class="text-on-surface-variant hover:text-white transition-colors h-20 flex items-center px-1 font-medium active:scale-95" href="#">Cek Klaim</a>
+<a class="nav-link-active h-20 flex items-center px-1 font-bold active:scale-95" href="#">Dashboard Analisis</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-white/10 transition-all duration-300">
+<span class="material-symbols-outlined text-primary">notifications</span>
+</button>
+<button class="p-2 rounded-full hover:bg-white/10 transition-all duration-300">
+<span class="material-symbols-outlined text-primary">settings</span>
+</button>
+<div class="w-10 h-10 rounded-full border border-white/20 overflow-hidden ml-2 shadow-[0_0_12px_rgba(0,82,255,0.2)]">
+<img class="w-full h-full object-cover" data-alt="User Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzsln33gyjTOqHefYqDX33ip2P1uLjG-yf61J3kHpSMaz0fy9DISldSfHe5ZWhM7YbVqcFgS7fKaRwcXplVar9j2n6ZQB0fg0V605E0GuvhvhXHE4ywSoQEcDVkGqhWUAuMVrOZ0YOl25tHL047UvgzZ1E4HVhWSJuY94wvhiuy8JHQkrBQPiwaoHx-cgS5zD3zSEZ7chISs33hj4b3MMuKYFFh6ajGSQQLGYrDVqzrrKfT3yYJTdN">
+</div>
+</div>
+</nav>
+<!-- SideNavBar (Persisted for structure but optimized for updated navigation flow) -->
+<aside class="fixed left-0 top-0 h-screen hidden lg:flex flex-col py-8 z-40 bg-surface-container-low/30 backdrop-blur-2xl border-r border-white/5 shadow-[4px_0_24px_rgba(0,0,0,0.5)] w-64 pt-24">
+<div class="px-6 mb-8">
+<h2 class="font-headline-md text-headline-md text-primary">Analisis</h2>
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest mt-1">Exploratory Module</p>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-4 px-6 py-4 text-secondary bg-secondary/10 shadow-[inset_0_0_12px_rgba(0,224,255,0.1)] border-r-4 border-secondary transition-all duration-200 active:scale-95" href="#">
+<span class="material-symbols-outlined">query_stats</span>
+<span class="font-label-caps text-label-caps">Analytics</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-4 text-on-tertiary-fixed-variant hover:text-secondary hover:bg-white/5 transition-colors group active:scale-95" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">fact_check</span>
+<span class="font-label-caps text-label-caps">Verify</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-4 text-on-tertiary-fixed-variant hover:text-secondary hover:bg-white/5 transition-colors group active:scale-95" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">menu_book</span>
+<span class="font-label-caps text-label-caps">Library</span>
+</a>
+</nav>
+<div class="mt-auto px-6 pt-6">
+<button class="w-full py-4 glass-panel rounded-xl text-primary font-bold hover:bg-primary-container hover:text-white transition-all duration-300 active:scale-95">
+                New Analysis
+            </button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="lg:ml-64 pt-32 px-container-padding pb-section-gap">
+<!-- Header Section -->
+<header class="mb-section-gap max-w-4xl">
+<h1 class="font-display-lg text-display-lg text-white mb-4">Dashboard Analisis Data</h1>
+<p class="font-accent-italic text-accent-italic text-on-surface-variant max-w-2xl leading-relaxed">
+                Insights derived from high-precision neural networks and medical claim verification pipelines. Observe the distribution of data fidelity across multiple healthcare vectors.
+            </p>
+</header>
+<!-- Data Grid (Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+<!-- Distribusi Kelas Section -->
+<section class="md:col-span-4 flex flex-col gap-8 transition-all duration-1000 opacity-100">
+<div class="glass-panel rounded-3xl p-glass-padding h-full min-h-[400px] flex flex-col">
+<div class="flex justify-between items-start mb-8">
+<div>
+<h3 class="font-headline-md text-headline-md text-primary mb-1">Distribusi Kelas</h3>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Label Balance Metrics</p>
+</div>
+<span class="material-symbols-outlined text-secondary-container">pie_chart</span>
+</div>
+<div class="flex-1 flex flex-col justify-center gap-8">
+<div class="relative h-48 w-full flex items-end justify-around pb-4">
+<!-- Visual Chart Mockup -->
+<div class="w-12 bg-primary-container/40 border border-primary-container rounded-t-lg h-[80%] relative group transition-all">
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 text-primary font-bold">52%</div>
+<div class="absolute inset-0 bg-primary-container shadow-[0_0_20px_rgba(0,82,255,0.4)] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="w-12 bg-error-container/40 border border-error rounded-t-lg h-[40%] relative group transition-all">
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 text-error font-bold">28%</div>
+<div class="absolute inset-0 bg-error shadow-[0_0_20px_rgba(255,180,171,0.4)] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="w-12 bg-secondary-container/40 border border-secondary-container rounded-t-lg h-[30%] relative group transition-all">
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 text-secondary-container font-bold">20%</div>
+<div class="absolute inset-0 bg-secondary-container shadow-[0_0_20px_rgba(0,224,255,0.4)] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+</div>
+<div class="grid grid-cols-1 gap-3">
+<div class="flex justify-between items-center px-4 py-2 bg-white/5 rounded-lg border border-white/10">
+<span class="text-on-surface-variant">Valid Claims</span>
+<span class="font-bold text-primary">1,240</span>
+</div>
+<div class="flex justify-between items-center px-4 py-2 bg-white/5 rounded-lg border border-white/10">
+<span class="text-on-surface-variant">Fraud Suspicion</span>
+<span class="font-bold text-error">642</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Statistik Deskriptif Section -->
+<section class="md:col-span-8 transition-all duration-1000 opacity-100">
+<div class="glass-panel rounded-3xl p-glass-padding h-full">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h3 class="font-headline-md text-headline-md text-primary mb-1">Statistik Deskriptif</h3>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Aggregated Claim Intelligence</p>
+</div>
+<div class="flex gap-2">
+<button class="px-3 py-1 text-[10px] uppercase font-bold tracking-widest border border-white/20 rounded-full hover:bg-white/10 transition-all active:scale-95">Daily</button>
+<button class="px-3 py-1 text-[10px] uppercase font-bold tracking-widest bg-primary-container text-white rounded-full active:scale-95">Monthly</button>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+<div class="p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-secondary-container/50 transition-all group">
+<p class="text-on-surface-variant font-label-caps mb-2">Mean Value</p>
+<h4 class="text-3xl font-bold text-white group-hover:text-secondary-container transition-colors">842.5</h4>
+<div class="mt-4 h-1 w-full bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-secondary-container w-3/4 cyan-glow"></div>
+</div>
+</div>
+<div class="p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-primary/50 transition-all group">
+<p class="text-on-surface-variant font-label-caps mb-2">Confidence</p>
+<h4 class="text-3xl font-bold text-white group-hover:text-primary transition-colors">98.2%</h4>
+<div class="mt-4 h-1 w-full bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[98%] cinematic-glow"></div>
+</div>
+</div>
+<div class="p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-error/50 transition-all group">
+<p class="text-on-surface-variant font-label-caps mb-2">Anomaly Rate</p>
+<h4 class="text-3xl font-bold text-white group-hover:text-error transition-colors">1.4%</h4>
+<div class="mt-4 h-1 w-full bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-error w-[5%] coral-glow"></div>
+</div>
+</div>
+</div>
+<div class="h-64 w-full bg-white/5 rounded-2xl relative overflow-hidden border border-white/10">
+<div class="absolute bottom-4 left-4 p-4 glass-panel rounded-xl">
+<p class="text-xs font-bold text-secondary-container">TREND ANALYSIS: STABLE</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Distribusi Panjang Karakter Section -->
+<section class="md:col-span-12 transition-all duration-1000 opacity-100">
+<div class="glass-panel rounded-3xl p-glass-padding">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+<div>
+<h3 class="font-headline-md text-headline-md text-primary mb-1">Distribusi Panjang Karakter</h3>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Linguistic Complexity Heatmap</p>
+</div>
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-primary cinematic-glow"></div>
+<span class="text-xs text-on-surface-variant">Short Summary</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-secondary-container cyan-glow"></div>
+<span class="text-xs text-on-surface-variant">Extended Detail</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+<div class="h-80 w-full relative">
+<div class="w-full h-full rounded-2xl bg-cover bg-center border border-white/10" data-alt="Sophisticated data visualization dashboard" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCK5oRuocZtSkqQCyhMRRJIZJjG7eLeslaOmzu1ZAFIpAVm26zAjkKLO7xGoV6FzIDz1tgo9pTYOdYfTcjCflTanSGojfQKzjtvXhE_vunx_TIOZSFA5OMi_Q9qhekWB60tkzCG4DEGPQM8a7V-iXPnsSmRxyAKZ-qPJHGHtTw7XknWBrET7D95qbmu4R9I97_X8wqPXo3AIgBjgeKOItVUbOxXzb-r_9mfJUTWuomxNW97_YJHxeJ2')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
+</div>
+<div class="space-y-6">
+<div class="p-6 glass-panel rounded-2xl">
+<h5 class="text-white font-bold mb-2">Claim Length Correlation</h5>
+<p class="text-on-surface-variant text-sm mb-4">Higher character counts typically correlate with higher claim validity scores in pediatric oncology datasets.</p>
+<div class="flex gap-4">
+<div class="flex-1">
+<p class="text-[10px] text-on-surface-variant uppercase mb-1">Min Length</p>
+<p class="text-xl font-bold text-primary">120 Chars</p>
+</div>
+<div class="flex-1">
+<p class="text-[10px] text-on-surface-variant uppercase mb-1">Max Length</p>
+<p class="text-xl font-bold text-secondary-container">4,800 Chars</p>
+</div>
+</div>
+</div>
+<div class="flex gap-4">
+<button class="flex-1 py-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all font-bold text-sm active:scale-95">Expand Dataset</button>
+<button class="flex-1 py-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all font-bold text-sm active:scale-95">Clear Filter</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer Action Section -->
+<footer class="mt-section-gap flex flex-col items-center">
+<div class="w-full max-w-4xl glass-panel rounded-[2rem] p-12 text-center relative overflow-hidden">
+<div class="absolute -top-24 -left-24 w-64 h-64 bg-primary/20 blur-[100px]"></div>
+<div class="absolute -bottom-24 -right-24 w-64 h-64 bg-secondary-container/20 blur-[100px]"></div>
+<h2 class="font-display-lg text-display-lg-mobile md:text-display-lg text-white mb-6">Ready to proceed?</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-10 max-w-xl mx-auto">
+                    The current exploratory data analysis confirms high model readiness. Proceed to training or export the comprehensive audit report.
+                </p>
+<div class="flex flex-col sm:flex-row gap-6 justify-center">
+<button class="group relative px-10 py-5 bg-primary-container text-white font-bold rounded-full cinematic-glow hover:scale-105 active:scale-95 transition-all overflow-hidden hover:shadow-[0_0_30px_rgba(0,82,255,0.6)]">
+<span class="relative z-10 flex items-center gap-2">
+                            Latih Model Sekarang
+                            <span class="material-symbols-outlined">rocket_launch</span>
+</span>
+<div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+</button>
+<button class="px-10 py-5 glass-panel text-secondary font-bold rounded-full border border-white/20 hover:bg-white/10 active:scale-95 transition-all flex items-center gap-2 hover:shadow-[0_0_25px_rgba(0,224,255,0.4)]">
+                        Unduh Laporan PDF
+                        <span class="material-symbols-outlined">download</span>
+</button>
+</div>
+</div>
+<div class="mt-12 flex flex-col items-center gap-2 text-on-surface-variant/40">
+<span class="font-label-caps text-label-caps">© 2024 CEKKLAIM INTELLIGENCE SYSTEMS</span>
+<div class="flex gap-4">
+<a class="hover:text-primary transition-colors" href="#">Privacy</a>
+<a class="hover:text-primary transition-colors" href="#">Terms</a>
+<a class="hover:text-primary transition-colors" href="#">Contact</a>
+</div>
+</div>
+</footer>
+</main>
+<!-- Micro-interaction Scripts -->
+<script>
+        // Subtle parallax effect on glass panels
+        document.addEventListener('mousemove', (e) => {
+            const panels = document.querySelectorAll('.glass-panel');
+            const x = (window.innerWidth / 2 - e.pageX) / 150;
+            const y = (window.innerHeight / 2 - e.pageY) / 150;
+
+            panels.forEach(panel => {
+                panel.style.transform = `translateX(${x}px) translateY(${y}px)`;
+            });
+        });
+
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100');
+                    entry.target.classList.remove('opacity-0', 'translate-y-10');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section').forEach(section => {
+            section.classList.add('transition-all', 'duration-1000', 'opacity-0', 'translate-y-10');
+            observer.observe(section);
+        });
+    </script>
+
+
+</body></html>

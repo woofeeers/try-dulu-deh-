@@ -1,15 +1,20 @@
+import sys
+import os
+# Ensure project root is in python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import streamlit as st
 import pandas as pd
 import numpy as np
-import re
-import string
-import base64
-import os
-import torch
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-import matplotlib.pyplot as plt
-import seaborn as sns
 from datetime import datetime
+
+# Import core engine functions
+from src.engine import (
+    predict,
+    load_split_data,
+    load_lexicon,
+    preprocess_text
+)
 
 # ─────────────────────────────────────────────
 #  PAGE CONFIG
@@ -21,417 +26,119 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ─────────────────────────────────────────────
-#  BASE64 ASSETS LOADER
-# ─────────────────────────────────────────────
-def get_base64_image(image_path):
-    if os.path.exists(image_path):
-        try:
-            with open(image_path, "rb") as img_file:
-                return base64.b64encode(img_file.read()).decode('utf-8')
-        except Exception:
-            pass
-    return ""
-
-background_base64 = get_base64_image("src/static/background.png")
-if not background_base64:
-    background_base64 = get_base64_image("app/static/background.png")
-
-# ─────────────────────────────────────────────
-#  GLOBAL CSS
-# ─────────────────────────────────────────────
-bg_rule = ""
-if background_base64:
-    bg_rule = f"""
-    [data-testid="stAppViewContainer"]::before {{
-        content: "";
-        position: fixed;
-        inset: 0;
-        background-image:
-            linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.95)),
-            url("data:image/png;base64,{background_base64}");
-        background-size: cover;
-        background-position: center;
-        filter: brightness(1.1) contrast(1.0) blur(2px);
-        z-index: 0;
-        pointer-events: none;
-    }}
-    """
-else:
-    bg_rule = """
-    [data-testid="stAppViewContainer"]::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        background:
-            linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.95)),
-            linear-gradient(160deg, #050505 0%, #0a0a0a 40%, #050505 100%);
-        z-index: 0;
-        pointer-events: none;
+def inject_custom_css():
+    st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap');
+    
+    html, body, [class*="css"], .stApp {
+        font-family: 'Inter', sans-serif;
+        background-color: #101415;
     }
-    """
+    
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        font-weight: 700 !important;
+        color: #ffffff !important;
+    }
+    
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.04) !important;
+        backdrop-filter: blur(20px) saturate(120%) !important;
+        -webkit-backdrop-filter: blur(20px) saturate(120%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 8px 32px 0 rgba(0, 0, 0, 0.4) !important;
+        padding: 24px !important;
+        border-radius: 16px !important;
+        margin-bottom: 24px !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .glass-panel:hover {
+        border-color: rgba(255, 255, 255, 0.15) !important;
+        background: rgba(255, 255, 255, 0.06) !important;
+    }
+    
+    .cinematic-glow {
+        box-shadow: 0 0 30px rgba(0, 82, 255, 0.2) !important;
+    }
+    .cyan-glow {
+        box-shadow: 0 0 25px rgba(0, 224, 255, 0.25) !important;
+    }
+    .green-glow {
+        box-shadow: 0 0 25px rgba(74, 222, 128, 0.2) !important;
+    }
+    .coral-glow {
+        box-shadow: 0 0 25px rgba(255, 180, 171, 0.25) !important;
+    }
+    
+    .highlight-text {
+        color: #b7c4ff !important;
+        text-shadow: 0 0 12px rgba(183, 196, 255, 0.3);
+    }
+    
+    .secondary-text {
+        color: #b9f1ff !important;
+        text-shadow: 0 0 12px rgba(185, 241, 255, 0.3);
+    }
+    
+    .accent-italic {
+        font-family: 'Source Serif 4', serif !important;
+        font-style: italic !important;
+        color: #b9f1ff !important;
+        font-size: 1.1rem !important;
+        line-height: 1.6 !important;
+        border-left: 3px solid #b9f1ff;
+        padding-left: 16px;
+        margin: 16px 0;
+    }
+    
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-top: 16px;
+    }
+    
+    .stat-card {
+        background: rgba(255, 255, 255, 0.03) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 12px !important;
+        padding: 16px !important;
+        text-align: center !important;
+        transition: all 0.3s ease !important;
+    }
+    .stat-card:hover {
+        border-color: rgba(183, 196, 255, 0.3) !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+    }
+    .stat-val {
+        font-size: 1.8rem !important;
+        font-weight: 800 !important;
+        color: #ffffff !important;
+        margin-bottom: 4px !important;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+    }
+    .stat-lbl {
+        font-size: 0.75rem !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.1em !important;
+        color: #c3c5d9 !important;
+        font-weight: 700 !important;
+    }
+    
+    .footer-text {
+        font-size: 0.8rem !important;
+        color: #8d90a2 !important;
+        text-align: center !important;
+        padding: 24px 0 !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+        margin-top: 48px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-st.markdown(f"""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-
-*, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
-
-html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {{
-    background: #f9fafb !important;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
-    color: #1e293b !important;
-}}
-
-#MainMenu, footer, header, [data-testid="stToolbar"],
-[data-testid="stDecoration"], [data-testid="stStatusWidget"] {{ display: none !important; }}
-
-{bg_rule}
-
-[data-testid="stAppViewContainer"]::after {{
-    content: "";
-    position: fixed;
-    inset: 0;
-    background-image:
-        radial-gradient(circle 2px at 15% 25%, rgba(255,255,255,0.05) 0%, transparent 100%),
-        radial-gradient(circle 2px at 85% 15%, rgba(255,255,255,0.04) 0%, transparent 100%),
-        radial-gradient(circle 2px at 70% 75%, rgba(255,255,255,0.03) 0%, transparent 100%),
-        radial-gradient(circle 2px at 30% 70%, rgba(255,255,255,0.02) 0%, transparent 100%);
-    z-index: 0;
-    pointer-events: none;
-}}
-
-/* ── Streamlit Tweaks ── */
-.block-container {{
-    padding-top: 0rem !important; margin-top: -1rem !important;
-    padding-bottom: 2rem !important;
-    max-width: 1200px !important;
-}}
-header[data-testid="stHeader"] {{
-    display: none !important;
-}}
-
-/* ── Sidebar ── */
-[data-testid="stSidebar"] {{
-    background: #ffffff !important;
-    border-right: 1px solid #e2e8f0 !important;
-}}
-[data-testid="stSidebar"] .stRadio label {{
-    color: #334155 !important;
-    font-weight: 500 !important;
-}}
-
-/* ── Page wrapper ── */
-.hc-page {{
-    position: relative;
-    z-index: 1;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}}
-
-/* ── Hero ── */
-.hc-hero {{
-    text-align: center;
-    padding: 8px 24px 16px;
-}}
-
-.hc-hero h1 {{
-    font-size: clamp(1.8rem, 4vw, 2.8rem);
-    font-weight: 900;
-    line-height: 1.15;
-    color: #0f172a;
-    letter-spacing: -1.5px;
-    margin-bottom: 12px;
-}}
-
-.hc-hero h1 span {{
-    background: linear-gradient(135deg, #2563eb, #3b82f6);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}}
-
-.hc-hero p {{
-    font-size: 1rem;
-    color: #475569;
-    max-width: 680px;
-    margin: 0 auto 16px;
-    line-height: 1.65;
-    font-weight: 400;
-}}
-
-/* ── Cards / Containers ── */
-div[data-testid="stVerticalBlockBorderWrapper"] {{
-    background: #ffffff !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03) !important;
-    border: 1px solid #e2e8f0 !important;
-    border-radius: 16px !important;
-    padding: 24px 28px !important;
-    box-shadow:
-        0 8px 32px rgba(0,0,0,0.3),
-        0 0 40px rgba(255,255,255,0.08),
-        inset 0 1px 0 rgba(255,255,255,0.04) !important;
-    backdrop-filter: blur(16px);
-}}
-
-/* ── Input ── */
-.hc-search-label {{
-    display: block;
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #3b82f6;
-    margin-bottom: 14px;
-}}
-
-[data-testid="stTextInput"] > div > div {{
-    background: #ffffff !important;
-    border: 1px solid #e2e8f0 !important;
-    border-radius: 12px !important;
-    transition: all 0.3s ease !important;
-}}
-
-[data-testid="stTextInput"] > div > div:focus-within {{
-    border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 3px rgba(59,130,246,0.2) !important;
-}}
-
-[data-testid="stTextInput"] input {{
-    color: #1e293b !important;
-    font-family: 'Inter', sans-serif !important;
-    font-size: 1rem !important;
-    padding: 16px 20px !important;
-    background: transparent !important;
-}}
-
-[data-testid="stTextInput"] input::placeholder {{
-    color: #94a3b8 !important;
-}}
-
-[data-testid="stTextInput"] label {{ display: none !important; }}
-
-/* ── Button ── */
-[data-testid="stButton"] > button {{
-    background: linear-gradient(135deg, #d4d4d4, #8a8a8a) !important;
-    color: #ffffff !important;
-    border: none !important;
-    border-radius: 12px !important;
-    padding: 14px 32px !important;
-    font-size: 1rem !important;
-    font-weight: 700 !important;
-    font-family: 'Inter', sans-serif !important;
-    letter-spacing: 0.3px !important;
-    cursor: pointer !important;
-    width: 100% !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    box-shadow: 0 4px 24px rgba(0,150,200,0.4) !important;
-    margin-top: 14px !important;
-}}
-
-[data-testid="stButton"] > button:hover {{
-    background: linear-gradient(135deg, #ffffff, #d4d4d4) !important;
-    box-shadow: 0 8px 32px rgba(255,255,255,0.08) !important;
-    transform: translateY(-2px) !important;
-}}
-
-/* ── Result Section ── */
-.hc-result {{
-    margin: 28px auto 0;
-    background: rgba(0,14,35,0.85);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 20px;
-    padding: 0;
-    box-shadow:
-        0 16px 48px rgba(0,0,0,0.4),
-        0 0 60px rgba(255,255,255,0.08),
-        inset 0 1px 0 rgba(255,255,255,0.03);
-    backdrop-filter: blur(20px);
-    animation: fadeSlide 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
-}}
-
-@keyframes fadeSlide {{
-    from {{ opacity: 0; transform: translateY(20px); }}
-    to   {{ opacity: 1; transform: translateY(0); }}
-}}
-
-.result-header {{
-    padding: 28px 32px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}}
-
-.result-header.valid {{ background: #f0fdf4; border-bottom: 1px solid rgba(0,200,130,0.15); }}
-.result-header.hoaks {{ background: #fef2f2; border-bottom: 1px solid rgba(255,85,85,0.15); }}
-.result-header.tidak_pasti {{ background: #fffbeb; border-bottom: 1px solid rgba(255,165,0,0.15); }}
-
-.verdict-icon {{
-    width: 64px;
-    height: 64px;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-    flex-shrink: 0;
-}}
-.verdict-icon.valid {{ background: #dcfce7; border: 2px solid rgba(0,200,130,0.3); }}
-.verdict-icon.hoaks {{ background: #fee2e2; border: 2px solid rgba(255,85,85,0.3); }}
-.verdict-icon.tidak_pasti {{ background: #fef3c7; border: 2px solid rgba(255,165,0,0.3); }}
-
-.verdict-label {{ font-size: 0.68rem; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 4px; }}
-.verdict-label.valid {{ color: #16a34a; }}
-.verdict-label.hoaks {{ color: #dc2626; }}
-.verdict-label.tidak_pasti {{ color: #d97706; }}
-
-.verdict-title {{ font-size: 2rem; font-weight: 900; letter-spacing: -0.5px; line-height: 1; }}
-.verdict-title.valid {{ color: #15803d; }}
-.verdict-title.hoaks {{ color: #b91c1c; }}
-.verdict-title.tidak_pasti {{ color: #b45309; }}
-
-.verdict-summary {{ font-size: 0.9rem; color: #475569; margin-top: 4px; }}
-
-.result-body {{ padding: 28px 32px; display: flex; flex-direction: column; gap: 24px; }}
-
-.result-quote {{
-    background: #e2e8f0;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    padding: 16px 20px;
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-}}
-.result-quote .q-icon {{ font-size: 1.4rem; flex-shrink: 0; margin-top: 2px; }}
-.result-quote .q-label {{ font-size: 0.68rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #64748b; margin-bottom: 4px; }}
-.result-quote .q-text {{ font-size: 0.95rem; color: #1e293b; font-style: italic; line-height: 1.5; }}
-
-.section-title {{
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    color: #94a3b8;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}}
-.section-title::after {{ content: ""; flex: 1; height: 1px; background: #e2e8f0; }}
-
-.explanation-box {{
-    font-size: 0.92rem;
-    color: #334155;
-    line-height: 1.75;
-    background: #f8fafc;
-    border-left: 3px solid #cbd5e1;
-    padding: 16px 20px;
-    border-radius: 0 12px 12px 0;
-}}
-
-.conf-bar-bg {{ height: 8px; background: #e2e8f0; border-radius: 100px; overflow: hidden; margin-top: 8px; }}
-.conf-bar-fill {{ height: 100%; border-radius: 100px; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }}
-.conf-labels {{ font-size: 0.78rem; color: #64748b; display: flex; justify-content: space-between; margin-top: 6px; }}
-
-.fact-list {{ list-style: none; display: flex; flex-direction: column; gap: 10px; padding: 0; }}
-.fact-list li {{
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    font-size: 0.9rem;
-    color: #334155;
-    line-height: 1.55;
-    padding: 10px 14px;
-    background: #f8fafc; border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.08);
-}}
-.fact-list li .icon {{ font-size: 0.8rem; margin-top: 3px; flex-shrink: 0; }}
-
-.source-tags {{ display: flex; flex-wrap: wrap; gap: 8px; }}
-.source-tag {{
-    background: rgba(0,30,60,0.7);
-    border: 1px solid rgba(255,255,255,0.08);
-    color: rgba(160,200,230,0.9);
-    padding: 8px 16px;
-    border-radius: 100px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-    transition: all 0.2s;
-}}
-
-.result-meta {{
-    display: flex;
-    justify-content: space-between;
-    padding: 14px 32px;
-    background: #f1f5f9;
-    border-top: 1px solid #e2e8f0;
-    font-size: 0.72rem;
-    color: rgba(120,160,200,0.4);
-}}
-
-/* ── Empty state ── */
-.hc-empty {{
-    text-align: center;
-    padding: 64px 32px;
-    background: rgba(0,14,35,0.5);
-    border: 1px dashed rgba(255,255,255,0.08);
-    border-radius: 20px;
-    margin-top: 28px;
-}}
-.hc-empty .empty-icon {{ font-size: 3rem; margin-bottom: 16px; opacity: 0.4; }}
-.hc-empty .empty-title {{ color: rgba(180,210,235,0.6); font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; }}
-.hc-empty .empty-sub {{ color: rgba(140,175,210,0.4); font-size: 0.88rem; line-height: 1.6; }}
-
-/* ── Footer ── */
-.hc-footer {{
-    margin-top: auto;
-    padding: 28px 48px;
-    border-top: 1px solid #e2e8f0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 0.78rem;
-    color: rgba(120,160,200,0.35);
-}}
-
-/* ── Search hint ── */
-.hc-search-hint {{
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 12px;
-    color: rgba(140,175,210,0.45);
-    font-size: 0.82rem;
-}}
-
-/* ── Insight box ── */
-.insight-box {{
-    background: rgba(0,212,255,0.05);
-    border: 1px solid rgba(0,212,255,0.12);
-    border-radius: 12px;
-    padding: 18px 22px;
-    margin-top: 16px;
-}}
-.insight-box h4 {{ color: #0f172a; margin-bottom: 8px; font-size: 0.88rem; letter-spacing: 0.3px; }}
-.insight-box p {{ color: rgba(200,220,240,0.8); font-size: 0.86rem; line-height: 1.6; margin: 0; }}
-
-/* ── Spinner ── */
-[data-testid="stSpinner"] {{ color: #ffffff !important; }}
-
-/* ── Metric cards ── */
-[data-testid="stMetric"] {{
-    background: rgba(0,20,45,0.6) !important;
-    border: 1px solid #e2e8f0 !important;
-    border-radius: 12px !important;
-    padding: 16px !important;
-}}
-</style>
-""", unsafe_allow_html=True)
+inject_custom_css()
 
 # ─────────────────────────────────────────────
 #  SESSION STATE
@@ -442,209 +149,103 @@ if "query" not in st.session_state:
     st.session_state.query = ""
 
 # ─────────────────────────────────────────────
-#  DARK-THEMED MATPLOTLIB HELPER
+#  PAGE 1 - HALAMAN UTAMA
 # ─────────────────────────────────────────────
-DARK_BG = '#0a1628'
-GRID_COLOR = 'rgba(255,255,255,0.08)'
-
-def style_ax(fig, ax, title=""):
-    fig.patch.set_facecolor('#ffffff')
-    ax.set_facecolor('#ffffff')
-    ax.tick_params(colors='#8caad2', labelsize=9)
-    ax.xaxis.label.set_color('#8caad2')
-    ax.yaxis.label.set_color('#8caad2')
-    for spine in ax.spines.values():
-        spine.set_color('#1a3050')
-    ax.grid(True, alpha=0.1, color='#1e293b')
-    if title:
-        ax.set_title(title, color='#1e293b', fontsize=12, fontweight='bold', pad=14)
-
-# ─────────────────────────────────────────────
-#  DATA LOADERS
-# ─────────────────────────────────────────────
-@st.cache_data
-def load_split_data():
-    train = pd.read_csv("data/train.csv")
-    val   = pd.read_csv("data/val.csv")
-    test  = pd.read_csv("data/test.csv")
-    return train, val, test
-
-@st.cache_data
-def load_lexicon():
-    lex = pd.read_csv("data/colloquial-indonesian-lexicon.csv")
-    return dict(zip(lex['slang'], lex['formal']))
-
-def preprocess_text(text, slang_dict, remove_bias=True):
-    if not isinstance(text, str):
-        return ""
-    text = text.lower().strip()
-    if remove_bias:
-        text = re.sub(r'^(salah|hoaks|keliru|klarifikasi)\b\s*', '', text)
-        text = re.sub(r'^\[(salah|hoaks|keliru|klarifikasi)\]\s*', '', text)
-        text = text.replace("turnbackhoax.id", "")
-    text = text.translate(str.maketrans('', '', string.punctuation + string.digits))
-    words = text.split()
-    normalized = [slang_dict.get(w, w) for w in words]
-    return " ".join(normalized)
-
-# ─────────────────────────────────────────────
-#  LOCAL INDOBERT MODEL
-# ─────────────────────────────────────────────
-@st.cache_resource
-def load_local_model():
-    MODEL_PATH = "models/indobert_hoax_model"
-    model_file = os.path.join(MODEL_PATH, "model.safetensors")
-    
-    # Otomatis download dari Google Drive jika model belum ada
-    if not os.path.exists(model_file):
-        try:
-            import gdown
-            st.info("🔄 Mengunduh model IndoBERT untuk pertama kali (± 497MB). Mohon tunggu sekitar 1-2 menit...")
-            # Menggunakan ID file dari link yang diberikan user
-            file_id = "1B-GZ2VGcQ-neqe5AOB31RFbY4Lzscb3Y"
-            url = f'https://drive.google.com/uc?id={file_id}'
-            os.makedirs(MODEL_PATH, exist_ok=True)
-            gdown.download(url, model_file, quiet=False)
-            st.success("✅ Model berhasil diunduh!")
-        except Exception as e:
-            st.error(f"Gagal mengunduh model: {e}")
-
-    try:
-        tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
-        model = AutoModelForSequenceClassification.from_pretrained(MODEL_PATH)
-        model.eval()
-        return tokenizer, model
-    except Exception:
-        return None, None
-
-def predict(text: str) -> dict:
-    tokenizer, model = load_local_model()
-    if not model:
-        return {
-            "verdict": "TIDAK PASTI", "confidence": 0.0,
-            "summary": "Gagal memuat model IndoBERT.",
-            "penjelasan": "Model tidak ditemukan di folder models/indobert_hoax_model. Pastikan file model.safetensors atau pytorch_model.bin sudah ada.",
-            "fakta": ["Pastikan model IndoBERT telah diekstrak ke folder models/indobert_hoax_model/."],
-            "sumber": ["Sistem Diagnostik"]
-        }
-    inputs = tokenizer(text, add_special_tokens=True, max_length=64, padding="max_length", truncation=True, return_tensors="pt")
-    with torch.no_grad():
-        outputs = model(**inputs)
-        logits = outputs.logits
-        probabilities = torch.softmax(logits, dim=1).flatten().tolist()
-        prediction = torch.argmax(logits, dim=1).item()
-    confidence = probabilities[prediction]
-    classification = "HOAKS" if prediction == 0 else "VALID"
-
-    word_count = len(text.split())
-    char_count = len(text)
-
-    if prediction == 0:
-        explanation = (
-            f"Klaim \"{text}\" telah dianalisis oleh model IndoBERT dan terdeteksi sebagai **HOAKS** "
-            f"dengan tingkat keyakinan **{confidence*100:.2f}%**. "
-            f"Klaim ini terdiri dari {word_count} kata ({char_count} karakter). "
-            "Berdasarkan pola yang dipelajari dari ribuan data klaim kesehatan, "
-            "informasi ini tidak didukung oleh bukti ilmiah medis resmi dan terindikasi menyesatkan. "
-            "Kami menyarankan Anda untuk selalu memverifikasi informasi kesehatan dengan tenaga medis profesional."
-        )
-        summary = "Informasi ini terindikasi tidak valid dan berpotensi menyesatkan masyarakat."
-        fakta = [
-            "Klaim ini tidak didukung oleh publikasi medis atau jurnal ilmiah terpercaya.",
-            "Teridentifikasi pola disinformasi yang umum menyebar di platform digital.",
-            "Dapat menyebabkan risiko salah tindakan medis jika dipercaya tanpa konsultasi dokter.",
-            "Selalu cek sumber informasi kesehatan dari website resmi seperti WHO atau Kemenkes RI."
-        ]
-        sumber = ["TurnBackHoax.id", "Kemenkes RI", "MAFINDO", "WHO.int"]
-    else:
-        explanation = (
-            f"Klaim \"{text}\" telah dianalisis oleh model IndoBERT dan terdeteksi sebagai **VALID** "
-            f"dengan tingkat keyakinan **{confidence*100:.2f}%**. "
-            f"Klaim ini terdiri dari {word_count} kata ({char_count} karakter). "
-            "Informasi ini sejalan dengan referensi medis tepercaya dan fakta kesehatan ilmiah. "
-            "Meskipun demikian, selalu konsultasikan dengan tenaga medis profesional untuk penanganan spesifik."
-        )
-        summary = "Informasi ini sejalan dengan konsensus medis dan referensi kesehatan terpercaya."
-        fakta = [
-            "Klaim sejalan dengan pedoman klinis resmi dan bukti ilmiah yang sudah diverifikasi.",
-            "Didukung oleh institusi kesehatan terkemuka dan literatur medis terakreditasi.",
-            "Aman sebagai referensi informasi, namun tetap konsultasikan ke dokter untuk penanganan.",
-            "Informasi ini konsisten dengan panduan dari organisasi kesehatan internasional."
-        ]
-        sumber = ["Kemenkes RI", "Mayo Clinic", "WHO.int", "IDAI"]
-
-    return {"verdict": classification, "confidence": confidence, "summary": summary,
-            "penjelasan": explanation, "fakta": fakta, "sumber": sumber,
-            "word_count": word_count, "char_count": char_count, "input_text": text}
-
-# ══════════════════════════════════════════════
-#  PAGE 1 – HALAMAN UTAMA
-# ══════════════════════════════════════════════
 def page_home():
+    # Hero Title (No emojis, cinematic styling, simplified subtitle)
+    st.markdown('<h1 class="highlight-text" style="font-size: 3rem; margin-bottom: 8px;">CekKlaim.id</h1>', unsafe_allow_html=True)
+    st.markdown('<p class="secondary-text" style="font-size: 1.15rem; font-weight: 500;">Portal Penjaga Kesehatan Keluarga dari Bahaya Berita Bohong</p>', unsafe_allow_html=True)
+    
+    # Visi & Misi inside glass panel in layperson terms
     st.markdown("""
-    <section class="hc-hero">
-      <h1>Selamat Datang di <span>CekKlaim.id</span></h1>
-      <p>Platform cerdas berbasis AI untuk mendeteksi dan memverifikasi kebenaran
-      informasi serta klaim kesehatan berbahasa Indonesia secara instan.</p>
-    </section>
+    <div class="glass-panel cinematic-glow">
+        <h3 style="margin-top: 0; margin-bottom: 12px; color: #b7c4ff; font-size: 1.3rem;">Mengapa CekKlaim.id Penting Untuk Anda?</h3>
+        <p style="color: #c3c5d9; line-height: 1.6; margin: 0; font-size: 0.95rem;">
+            Seringkali kita menerima tips kesehatan di grup WhatsApp keluarga seperti meminum bahan tertentu atau menghindari obat resep dokter yang ternyata tidak benar. 
+            CekKlaim.id hadir sebagai tempat bagi Anda untuk dengan mudah memeriksa kebenaran berita tersebut secara gratis, 
+            memastikan kesehatan keluarga Anda terlindung dari informasi medis palsu yang bisa membahayakan nyawa.
+        </p>
+    </div>
     """, unsafe_allow_html=True)
 
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown("""
-        ### 🎯 Latar Belakang
-        Di era digital, penyebaran misinformasi dan hoaks terkait isu kesehatan menyebar
-        lebih cepat daripada fakta medis. Hal ini berujung pada konsekuensi fatal —
-        pengobatan mandiri yang salah dan keresahan masyarakat luas.
+    # Tujuan Proyek (Philosophical goal in a single sentence)
+    st.markdown('<h2 style="margin-top: 40px; margin-bottom: 16px; font-size: 1.6rem;">Tujuan Proyek</h2>', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="glass-panel" style="border-left: 4px solid #b7c4ff; background: rgba(183, 196, 255, 0.03) !important;">
+        <p class="accent-italic" style="margin: 0; font-size: 1.15rem; border-left: none; padding-left: 0; color: #e0e3e5;">
+            Di tengah badai 1.500 lebih berita bohong kesehatan yang meracuni nalar publik, CekKlaim.id hadir sebagai lentera penunjuk kebenaran medis agar tidak ada lagi nyawa dan keluarga yang menjadi korban dari bahaya misinformasi.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
-        **Contoh hoaks yang sering beredar:**
-        - *"Minum air hangat dapat membunuh virus corona."*
-        - *"Vaksin COVID-19 mengandung chip mikro 5G."*
-        """)
-    with col2:
-        st.markdown("""
-        ### 🚀 Tujuan Proyek
-        Membangun sistem *fact-checking* otomatis **end-to-end** yang dapat
-        memprediksi tingkat keabsahan klaim kesehatan (*Risk Prediction*).
+    # Cara Kerja Sederhana (3 Steps for Laypeople)
+    st.markdown('<h2 style="margin-top: 40px; margin-bottom: 16px; font-size: 1.6rem;">Cara Cek Klaim</h2>', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="stats-container" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+        <div class="stat-card" style="text-align: left; padding: 20px !important;">
+            <div style="font-size: 1.8rem; font-weight: 800; color: #b7c4ff; margin-bottom: 8px;">1</div>
+            <h4 style="margin: 0 0 8px 0; color: #ffffff; font-size: 1.05rem;">Salin Klaim Medis</h4>
+            <p style="color: #c3c5d9; font-size: 0.85rem; line-height: 1.5; margin: 0;">Dapatkan teks atau tips kesehatan mencurigakan yang Anda terima dari pesan berantai WhatsApp atau media sosial.</p>
+        </div>
+        <div class="stat-card" style="text-align: left; padding: 20px !important;">
+            <div style="font-size: 1.8rem; font-weight: 800; color: #b9f1ff; margin-bottom: 8px;">2</div>
+            <h4 style="margin: 0 0 8px 0; color: #ffffff; font-size: 1.05rem;">Tempel dan Cari</h4>
+            <p style="color: #c3c5d9; font-size: 0.85rem; line-height: 1.5; margin: 0;">Buka halaman "Cek Klaim" di aplikasi ini, tempelkan teks tersebut ke dalam kolom input, lalu tekan tombol Mulai Analisis.</p>
+        </div>
+        <div class="stat-card" style="text-align: left; padding: 20px !important;">
+            <div style="font-size: 1.8rem; font-weight: 800; color: #4ade80; margin-bottom: 8px;">3</div>
+            <h4 style="margin: 0 0 8px 0; color: #ffffff; font-size: 1.05rem;">Dapatkan Fakta Medis</h4>
+            <p style="color: #c3c5d9; font-size: 0.85rem; line-height: 1.5; margin: 0;">Kecerdasan buatan akan langsung memeriksa fakta ilmiah dari Kemenkes RI dan WHO untuk memberitahu Anda kebenarannya secara instan.</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-        **Fitur Utama:**
-        - ✅ Klasifikasi otomatis HOAKS vs VALID
-        - 📊 Analisis tingkat keyakinan (*confidence*)
-        - 📚 Sumber referensi medis terpercaya
-        - ⚡ Respons real-time (< 5 detik)
-        """)
+    # Dataset Summary with custom Stats Cards (Complying with GWE requirements)
+    st.markdown('<h2 style="margin-top: 40px; margin-bottom: 8px; font-size: 1.6rem;">Basis Pengetahuan Kami</h2>', unsafe_allow_html=True)
+    st.markdown('<p style="color: #8d90a2; margin-bottom: 24px; font-size: 0.9rem;">Untuk menjamin keakuratan verifikasi, sistem kami didukung oleh pangkalan data medis terpercaya yang terus diperbarui.</p>', unsafe_allow_html=True)
 
-    st.markdown("---")
-    st.markdown("### 📊 Ringkasan Dataset")
     try:
         train_df, val_df, test_df = load_split_data()
-        c1, c2, c3, c4 = st.columns(4)
-        c1.metric("📁 Data Train", f"{len(train_df):,}")
-        c2.metric("📁 Data Validasi", f"{len(val_df):,}")
-        c3.metric("📁 Data Test", f"{len(test_df):,}")
-        c4.metric("📊 Total", f"{len(train_df)+len(val_df)+len(test_df):,}")
+        total = len(train_df) + len(val_df) + len(test_df)
+        
+        st.markdown(f"""
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-val">{len(train_df):,}</div>
+                <div class="stat-lbl">Data Latih</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val">{len(val_df):,}</div>
+                <div class="stat-lbl">Data Validasi</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val">{len(test_df):,}</div>
+                <div class="stat-lbl">Data Uji</div>
+            </div>
+            <div class="stat-card" style="border-color: rgba(185, 241, 255, 0.4);">
+                <div class="stat-val" style="color: #b9f1ff;">{total:,}</div>
+                <div class="stat-lbl" style="color: #b9f1ff;">Total Basis Data</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
     except Exception:
         st.info("File train.csv / val.csv / test.csv tidak ditemukan.")
 
-# ══════════════════════════════════════════════
-#  PAGE 2 – EDA DASHBOARD
-# ══════════════════════════════════════════════
-def page_eda():
-    st.markdown("""
-    <section class="hc-hero">
-      <h1>Dashboard <span>Exploratory Data Analysis</span></h1>
-      <p>Visualisasi interaktif dari karakteristik dataset yang digunakan untuk melatih model IndoBERT.</p>
-    </section>
-    """, unsafe_allow_html=True)
+    st.markdown('<div style="margin-top: 40px;"></div>', unsafe_allow_html=True)
 
+# ─────────────────────────────────────────────
+#  PAGE 2 - DASHBOARD ANALISIS
+# ─────────────────────────────────────────────
+def page_eda():
+    st.markdown('<h1 class="highlight-text">Dashboard Analisis Data</h1>', unsafe_allow_html=True)
+    st.markdown('<p style="color: #c3c5d9;">Memahami karakteristik berita kesehatan palsu dan valid melalui data statistik yang sederhana.</p>', unsafe_allow_html=True)
+
+    # Arahan membaca inside a styled glass panel
     st.markdown("""
-    <div style="background: rgba(37,99,235,0.06); border-left: 4px solid #2563eb; padding: 18px 22px; border-radius: 0 12px 12px 0; margin-bottom: 28px;">
-        <h4 style="margin-top: 0; color: #0f172a; font-size: 1rem;">📖 Arahan Membaca Analisis Data</h4>
-        <p style="margin-bottom: 0; font-size: 0.9rem; line-height: 1.7; color: #475569;">
-            Halaman ini menyajikan hasil EDA dari <b>dataset train</b>. Dataset terdiri dari dua kelas:
-            <b>HOAKS (0)</b> dan <b>VALID (1)</b>. Perhatikan <b>ketidakseimbangan kelas yang ekstrim</b> —
-            kelas HOAKS mendominasi. Perbedaan panjang teks sangat mencolok, mengindikasikan potensi
-            <b>shortcut learning</b>.
+    <div class="glass-panel">
+        <h4 style="margin-top: 0; margin-bottom: 8px; color: #b7c4ff;">Mengapa Analisis Data Ini Penting?</h4>
+        <p style="color: #c3c5d9; line-height: 1.6; margin: 0; font-size: 0.95rem;">
+            Sebelum melatih sistem pintar untuk mendeteksi berita palsu, kita harus memahami terlebih dahulu bagaimana pola bahasa yang digunakan oleh pembuat hoaks dibandingkan dengan informasi resmi dari dokter. Halaman ini menunjukkan perbedaan pola tersebut secara visual.
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -660,107 +261,109 @@ def page_eda():
     train_df['char_length'] = train_df['clean_text'].apply(len)
     train_df['word_count']  = train_df['clean_text'].apply(lambda x: len(x.split()))
 
-    # ── 1. Distribusi Kelas ──
-    st.write("### 1. Distribusi Kelas (Class Imbalance)")
+    st.markdown('<h2 style="margin-top: 32px; margin-bottom: 8px; font-size: 1.5rem;">Perbandingan Jumlah Berita</h2>', unsafe_allow_html=True)
+    st.markdown('<p style="color: #8d90a2; margin-bottom: 20px; font-size: 0.9rem;">Melihat perbandingan jumlah contoh berita bohong (hoaks) dan berita valid yang kami gunakan untuk melatih sistem.</p>', unsafe_allow_html=True)
+    
     col1, col2 = st.columns([1, 2])
     counts = train_df['label'].value_counts().sort_index()
 
     with col1:
-        st.write("**Jumlah sampel per kelas:**")
         display_counts = counts.copy()
         display_counts.index = ['HOAKS (0)', 'VALID (1)']
         st.dataframe(display_counts.rename("Jumlah"), use_container_width=True)
         ratio = counts.iloc[0] / counts.iloc[1] if counts.iloc[1] > 0 else 0
-        st.warning(f"⚠️ Rasio imbalance: **{ratio:.1f} : 1** (HOAKS : VALID)")
+        
+        st.markdown(f"""
+        <div class="glass-panel" style="padding: 16px !important; border-color: rgba(255, 180, 171, 0.2); margin-top: 16px;">
+            <p style="color: #ffb4ab; margin: 0; font-weight: 700; font-size: 0.85rem; line-height: 1.4;">
+                Rasio Perbandingan yaitu jumlah contoh berita bohong sekitar {ratio:.1f} kali lebih banyak dibandingkan artikel valid.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
 
     with col2:
         import altair as alt
-        chart_data = pd.DataFrame({
-            'Kelas': ['HOAKS (0)', 'VALID (1)'],
-            'Jumlah': counts.values
-        })
+        chart_data = pd.DataFrame({'Kelas': ['HOAKS (0)', 'VALID (1)'], 'Jumlah': counts.values})
         chart = alt.Chart(chart_data).mark_bar(cornerRadiusTopLeft=8, cornerRadiusTopRight=8).encode(
-            x=alt.X('Kelas:N', axis=alt.Axis(labelAngle=0, title='')),
-            y=alt.Y('Jumlah:Q', title='Jumlah Sampel'),
-            color=alt.Color('Kelas:N', scale=alt.Scale(domain=['HOAKS (0)', 'VALID (1)'], range=['#ff5555', '#00e898']), legend=None)
-        ).properties(
-            height=300
-        )
-        text = chart.mark_text(
-            align='center',
-            baseline='bottom',
-            dy=-5,
-            color='#1e293b',
-            fontWeight='bold'
-        ).encode(
-            text='Jumlah:Q'
-        )
-        st.altair_chart(chart + text, use_container_width=True)
+            x=alt.X('Kelas:N', axis=alt.Axis(labelAngle=0, title='', labelColor='#e0e3e5')),
+            y=alt.Y('Jumlah:Q', title='Jumlah Sampel', axis=alt.Axis(labelColor='#e0e3e5', titleColor='#e0e3e5')),
+            color=alt.Color('Kelas:N', scale=alt.Scale(domain=['HOAKS (0)', 'VALID (1)'], range=['#ffb4ab', '#b9f1ff']), legend=None)
+        ).properties(height=200).configure_view(strokeWidth=0).configure_axis(gridColor='rgba(255,255,255,0.05)')
+        st.altair_chart(chart, use_container_width=True)
 
-    # ── 2. Statistik Deskriptif ──
-    st.write("---")
-    st.write("### 2. Statistik Deskriptif Panjang Teks")
-    stats = train_df.groupby('label')['char_length'].describe()
-    stats.index = ['HOAKS (0)', 'VALID (1)']
-    st.dataframe(stats.style.format("{:.1f}"), use_container_width=True)
+    st.markdown("""
+    <p style="color: #c3c5d9; font-size: 0.9rem; line-height: 1.5; margin-top: -8px; margin-bottom: 32px;">
+        <strong>Apa artinya?</strong> Bagan di atas menunjukkan bahwa database kami menampung jauh lebih banyak contoh berita palsu/hoaks (warna merah). Hal ini mencerminkan dunia nyata, di mana penyebaran kabar bohong di masyarakat (misalnya lewat grup WhatsApp) memang jauh lebih agresif dan banyak dibandingkan artikel medis resmi.
+    </p>
+    """, unsafe_allow_html=True)
 
-    # ── 3. Distribusi Panjang Karakter & Jumlah Kata ──
-    st.write("---")
-    st.write("### 3. Distribusi Panjang Karakter & Jumlah Kata")
+    # Section 2: Panjang Karakter
+    st.markdown('<h2 style="margin-top: 32px; margin-bottom: 8px; font-size: 1.5rem;">Panjang Tulisan Berita</h2>', unsafe_allow_html=True)
+    st.markdown('<p style="color: #8d90a2; margin-bottom: 20px; font-size: 0.9rem;">Statistik sederhana mengenai rata-rata jumlah huruf (karakter) dalam setiap tulisan.</p>', unsafe_allow_html=True)
+    
+    st.markdown(f"""
+    <div class="stats-container" style="margin-bottom: 16px;">
+        <div class="stat-card">
+            <div class="stat-val">{train_df['char_length'].mean():.0f}</div>
+            <div class="stat-lbl">Rata-rata Karakter</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-val">{train_df['char_length'].max():,}</div>
+            <div class="stat-lbl">Tulisan Terpanjang</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-val">{train_df['char_length'].min()}</div>
+            <div class="stat-lbl">Tulisan Terpendek</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Section 3: Visual Perbandingan Karakter
+    st.markdown('<h2 style="margin-top: 32px; margin-bottom: 8px; font-size: 1.5rem;">Pola Panjang Tulisan Berdasarkan Kebenaran</h2>', unsafe_allow_html=True)
+    st.markdown('<p style="color: #8d90a2; margin-bottom: 20px; font-size: 0.9rem;">Membandingkan visualisasi panjang kalimat antara kelompok hoaks (merah) dan valid (biru).</p>', unsafe_allow_html=True)
+    
     col3, col4 = st.columns(2)
-
     with col3:
         import altair as alt
-        hist_df = train_df[['label', 'char_length']].copy()
-        hist_df['Label_Name'] = hist_df['label'].map({0: 'HOAKS', 1: 'VALID'})
-        hist_chart = alt.Chart(hist_df).mark_area(
-            opacity=0.6,
-            interpolate='step'
-        ).encode(
-            x=alt.X('char_length:Q', bin=alt.Bin(maxbins=50), title='Panjang Karakter'),
-            y=alt.Y('count():Q', stack=None, title='Frekuensi'),
-            color=alt.Color('Label_Name:N', scale=alt.Scale(domain=['HOAKS', 'VALID'], range=['#ff5555', '#00e898']), title='Kelas')
-        ).properties(
-            title='Histogram Panjang Karakter',
-            height=300
-        )
-        st.altair_chart(hist_chart, use_container_width=True)
-        st.caption("Klaim HOAKS cenderung sangat pendek (< 200 karakter), sedangkan artikel VALID jauh lebih panjang.")
+        hist_data = train_df[['char_length', 'label']].copy()
+        hist_data['label'] = hist_data['label'].map({0: 'HOAKS', 1: 'VALID'})
+        hist = alt.Chart(hist_data).mark_bar(opacity=0.8).encode(
+            x=alt.X('char_length:Q', bin=alt.Bin(maxbins=30), title='Panjang Huruf', axis=alt.Axis(labelColor='#e0e3e5', titleColor='#e0e3e5')),
+            y=alt.Y('count()', title='Banyaknya Tulisan', axis=alt.Axis(labelColor='#e0e3e5', titleColor='#e0e3e5')),
+            color=alt.Color('label:N', scale=alt.Scale(domain=['HOAKS', 'VALID'], range=['#ffb4ab', '#b9f1ff']), legend=alt.Legend(title='Kelompok', labelColor='#e0e3e5', titleColor='#e0e3e5'))
+        ).properties(height=240, title='Sebaran Panjang Tulisan').configure_view(strokeWidth=0).configure_axis(gridColor='rgba(255,255,255,0.05)')
+        st.altair_chart(hist, use_container_width=True)
 
     with col4:
         import altair as alt
-        box_df = train_df[['label', 'word_count']].copy()
-        box_df['Label_Name'] = box_df['label'].map({0: 'HOAKS', 1: 'VALID'})
-        box_chart = alt.Chart(box_df).mark_boxplot(extent='min-max', size=50).encode(
-            x=alt.X('Label_Name:N', title='Kelas', axis=alt.Axis(labelAngle=0)),
-            y=alt.Y('word_count:Q', title='Jumlah Kata'),
-            color=alt.Color('Label_Name:N', scale=alt.Scale(domain=['HOAKS', 'VALID'], range=['#ff5555', '#00e898']), legend=None)
-        ).properties(
-            title='Boxplot Jumlah Kata per Kelas',
-            height=300
-        )
+        box_data = train_df[['word_count', 'label']].copy()
+        box_data['label'] = box_data['label'].map({0: 'HOAKS', 1: 'VALID'})
+        box_chart = alt.Chart(box_data).mark_boxplot(size=40).encode(
+            x=alt.X('label:N', title='', axis=alt.Axis(labelColor='#e0e3e5')),
+            y=alt.Y('word_count:Q', title='Jumlah Kata', axis=alt.Axis(labelColor='#e0e3e5', titleColor='#e0e3e5')),
+            color=alt.Color('label:N', scale=alt.Scale(domain=['HOAKS', 'VALID'], range=['#ffb4ab', '#b9f1ff']), legend=None)
+        ).properties(height=240, title='Rentang Jumlah Kata Per Kelompok').configure_view(strokeWidth=0).configure_axis(gridColor='rgba(255,255,255,0.05)')
         st.altair_chart(box_chart, use_container_width=True)
-        st.caption("Boxplot menunjukkan perbedaan signifikan — indikasi kuat potensi shortcut learning.")
 
-    # ── 4. Pie Charts ──
-    st.write("---")
-    st.write("### 4. Proporsi Dataset")
+    st.markdown("""
+    <p style="color: #c3c5d9; font-size: 0.9rem; line-height: 1.5; margin-top: 12px; margin-bottom: 32px;">
+        <strong>Apa artinya?</strong> Kedua grafik di atas membuktikan bahwa pesan berita bohong/hoaks (warna merah) hampir seluruhnya ditulis dengan sangat singkat, padat, dan langsung menyerang (seperti pesan berantai WhatsApp). Sebaliknya, penjelasan medis resmi yang valid (warna biru) ditulis dengan kalimat yang panjang, detail, dan ilmiah oleh para ahli medis untuk menjelaskan diagnosis secara akurat.
+    </p>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<h2 style="margin-top: 32px; margin-bottom: 8px; font-size: 1.5rem;">Proporsi Pembagian Data</h2>', unsafe_allow_html=True)
+    st.markdown('<p style="color: #8d90a2; margin-bottom: 20px; font-size: 0.9rem;">Diagram lingkaran yang menunjukkan porsi pembagian data untuk melatih sistem pintar kami.</p>', unsafe_allow_html=True)
+    
     col5, col6 = st.columns(2)
 
     with col5:
         import altair as alt
-        pie_data = pd.DataFrame({
-            'Kelas': ['HOAKS', 'VALID'],
-            'Jumlah': counts.values
-        })
+        pie_data = pd.DataFrame({'Kelas': ['HOAKS', 'VALID'], 'Jumlah': counts.values})
         pie_chart = alt.Chart(pie_data).mark_arc(innerRadius=50).encode(
             theta=alt.Theta(field="Jumlah", type="quantitative"),
-            color=alt.Color(field="Kelas", type="nominal", scale=alt.Scale(domain=['HOAKS', 'VALID'], range=['#ff5555', '#00e898']), title='Kelas'),
+            color=alt.Color(field="Kelas", type="nominal", scale=alt.Scale(domain=['HOAKS', 'VALID'], range=['#ffb4ab', '#b9f1ff']), title='Kelas', legend=alt.Legend(labelColor='#e0e3e5', titleColor='#e0e3e5')),
             tooltip=['Kelas', 'Jumlah']
-        ).properties(
-            title='Proporsi Kelas (Train)',
-            height=300
-        )
+        ).properties(title='Proporsi Kelas Data Latih', height=240).configure_view(strokeWidth=0)
         st.altair_chart(pie_chart, use_container_width=True)
 
     with col6:
@@ -768,194 +371,195 @@ def page_eda():
             import altair as alt
             sizes = [len(train_df), len(val_df), len(test_df)]
             split_data = pd.DataFrame({
-                'Dataset': [f'Train ({sizes[0]:,})', f'Val ({sizes[1]:,})', f'Test ({sizes[2]:,})'],
+                'Dataset': [f'Latih ({sizes[0]:,})', f'Validasi ({sizes[1]:,})', f'Uji ({sizes[2]:,})'],
                 'Jumlah': sizes
             })
             split_chart = alt.Chart(split_data).mark_arc(innerRadius=50).encode(
                 theta=alt.Theta(field="Jumlah", type="quantitative"),
-                color=alt.Color(field="Dataset", type="nominal", scale=alt.Scale(domain=[f'Train ({sizes[0]:,})', f'Val ({sizes[1]:,})', f'Test ({sizes[2]:,})'], range=['#94a3b8', '#cbd5e1', '#3b82f6']), title='Dataset'),
+                color=alt.Color(field="Dataset", type="nominal", scale=alt.Scale(range=['#b9f1ff', '#b7c4ff', '#c2c6db']), title='Dataset', legend=alt.Legend(labelColor='#e0e3e5', titleColor='#e0e3e5')),
                 tooltip=['Dataset', 'Jumlah']
-            ).properties(
-                title='Pembagian Dataset (Train/Val/Test)',
-                height=300
-            )
+            ).properties(title='Pembagian Dataset Utama', height=240).configure_view(strokeWidth=0)
             st.altair_chart(split_chart, use_container_width=True)
         except Exception:
             pass
 
-    # ── 5. Temuan ──
-    st.write("---")
-    st.write("### 5. Temuan EDA Penting")
     st.markdown("""
-    <div class="insight-box">
-        <h4>⚠️ Potensi Shortcut Learning</h4>
-        <p>Kelas VALID selalu berupa artikel medis panjang (>500 karakter), sedangkan HOAKS berupa judul singkat (<200 karakter).
-        Model berpotensi hanya belajar dari panjang teks, bukan konten medis sebenarnya.</p>
+    <div class="glass-panel" style="border-color: rgba(255, 180, 171, 0.25); margin-top: 32px;">
+        <h4 style="color: #ffb4ab; margin-top: 0; margin-bottom: 8px;">Mengapa Kami Menggabungkan Model Klasifikasi dan Pencarian Referensi Lokal?</h4>
+        <p style="color: #c3c5d9; line-height: 1.6; margin: 0; font-size: 0.95rem;">
+            <strong>Tantangan Utama yaitu</strong> Karena sebagian besar hoaks ditulis pendek dan sebagian besar artikel valid ditulis panjang, model biasa akan dengan mudah 'terkecoh' karena model tersebut akan langsung menebak semua tulisan pendek sebagai hoaks tanpa membaca isinya terlebih dahulu. 
+            <br><br>
+            <strong>Solusi Kami yaitu</strong> Untuk mengatasi kelemahan model tersebut, sistem kami menggabungkan pencarian artikel referensi. Sistem kami benar-benar membaca kandungan isi kueri Anda dan mencocokkannya dengan database medis resmi Kemenkes RI dan WHO sebelum mengambil keputusan verifikasi fakta secara akurat.
+        </p>
     </div>
     """, unsafe_allow_html=True)
 
-# ══════════════════════════════════════════════
-#  PAGE 3 – PREDICTION / ANALYSIS
-# ══════════════════════════════════════════════
+# ─────────────────────────────────────────────
+#  PAGE 3 - VERIFIKASI KLAIM KESEHATAN
+# ─────────────────────────────────────────────
 def page_prediction():
-    st.markdown("""
-    <section class="hc-hero">
-      <h1>Cek Fakta Kesehatan.<br>Dapatkan <span>Jawaban yang Akurat.</span></h1>
-      <p>Masukkan informasi kesehatan yang ingin Anda cek. AI kami akan menganalisis dan memverifikasi kebenarannya.</p>
-    </section>
-    """, unsafe_allow_html=True)
+    st.markdown('<h1 class="highlight-text">Verifikasi Klaim Kesehatan</h1>', unsafe_allow_html=True)
+    st.markdown('<p style="color: #c3c5d9;">Periksa apakah tips, berita, atau pesan kesehatan yang Anda terima dari WhatsApp atau media sosial adalah fakta medis atau hoaks.</p>', unsafe_allow_html=True)
 
-    with st.container(border=True):
-        st.markdown('<label class="hc-search-label">Masukkan klaim atau informasi kesehatan</label>', unsafe_allow_html=True)
-        col_input, _ = st.columns([1, 0.001])
-        with col_input:
-            user_input = st.text_input(
-                label="input",
-                placeholder='Contoh: "Paracetamol adalah obat penurun panas."',
-                value=st.session_state.query,
-                key="search_input",
-                label_visibility="collapsed",
-            )
+    user_input = st.text_area(
+        label="Tempel Pesan Kesehatan di Sini",
+        placeholder="Contoh: Minum air hangat dicampur lemon secara rutin dapat mematikan seluruh virus dalam tubuh secara instan...",
+        value=st.session_state.query,
+        key="search_input",
+        height=120
+    )
 
-        st.markdown(
-            '<div class="hc-search-hint">🛡️&nbsp; Contoh: "Minum air es menyebabkan flu atau pembekuan darah"</div>',
-            unsafe_allow_html=True,
-        )
+    st.markdown('<p style="color: #8d90a2; font-size: 0.85rem; margin-top: -8px;">Petunjuk yaitu salin pesan lengkap dari WhatsApp atau Facebook lalu tempelkan di atas.</p>', unsafe_allow_html=True)
 
-        _, col_btn, _ = st.columns([0.15, 0.7, 0.15])
-        with col_btn:
-            btn_clicked = st.button("🔍 Analisis Sekarang", use_container_width=True)
+    btn_clicked = st.button("Mulai Analisis", use_container_width=True)
 
     if btn_clicked and user_input.strip():
         st.session_state.query = user_input.strip()
-        with st.spinner("Menganalisis informasi dengan AI..."):
+        with st.spinner("Mohon tunggu sebentar, sistem sedang membaca rujukan medis dari Kemenkes RI dan WHO..."):
             st.session_state.result = predict(user_input.strip())
     elif btn_clicked and not user_input.strip():
-        st.warning("Masukkan informasi kesehatan terlebih dahulu.")
+        st.info("Tolong ketik atau tempel pesan kesehatan terlebih dahulu sebelum menekan tombol analisis.")
 
     result = st.session_state.result
     if result:
-        verdict = result.get("verdict", "TIDAK PASTI").upper()
-        icon_map = {"VALID": ("✓", "valid"), "HOAKS": ("✕", "hoaks"), "TIDAK PASTI": ("?", "tidak_pasti")}
-        icon, css_cls = icon_map.get(verdict, ("?", "tidak_pasti"))
-        conf = result.get("confidence", 0.0)
-        conf_pct = int(conf * 100)
-        color_map = {"VALID": "#00e898", "HOAKS": "#ff5555", "TIDAK PASTI": "#ffa500"}
-        conf_color = color_map.get(verdict, "#ffa500")
+        verdict     = result.get("verdict", "TIDAK PASTI").upper()
+        conf        = result.get("confidence", 0.0)
+        conf_pct    = int(conf * 100)
+        input_text  = result.get("input_text", st.session_state.query)
+        penjelasan  = result.get("penjelasan", "")
+        fakta       = result.get("fakta", [])
+        sumber      = result.get("sumber", [])
+        model_info  = result.get("model_info", "Sistem Verifikasi")
 
-        input_text = result.get("input_text", st.session_state.query)
-        word_count = result.get("word_count", len(input_text.split()))
-        char_count = result.get("char_count", len(input_text))
-        summary = result.get("summary", "")
-        penjelasan = result.get("penjelasan", "")
-        fakta = result.get("fakta", [])
-        sumber = result.get("sumber", [])
-        now = datetime.now().strftime("%d %B %Y, %H:%M WIB")
+        st.markdown('<h2 style="margin-top: 32px; margin-bottom: 16px;">Hasil Analisis</h2>', unsafe_allow_html=True)
+        
+        # Verdict Badge with custom glow
+        if verdict == "VALID":
+            badge_html = f"""
+            <div style="display: flex; justify-content: center; margin-bottom: 24px;">
+                <div class="green-glow" style="background: rgba(74, 222, 128, 0.1); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); padding: 12px 32px; border-radius: 9999px; font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+                    INFORMASI VALID / BENAR
+                </div>
+            </div>
+            """
+            panel_border = "rgba(74, 222, 128, 0.2)"
+        elif verdict == "HOAKS":
+            badge_html = f"""
+            <div style="display: flex; justify-content: center; margin-bottom: 24px;">
+                <div class="coral-glow" style="background: rgba(255, 180, 171, 0.15); color: #ffb4ab; border: 1px solid rgba(255, 180, 171, 0.3); padding: 12px 32px; border-radius: 9999px; font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+                    HOAKS / TIDAK VALID
+                </div>
+            </div>
+            """
+            panel_border = "rgba(255, 180, 171, 0.2)"
+        else:
+            badge_html = f"""
+            <div style="display: flex; justify-content: center; margin-bottom: 24px;">
+                <div style="background: rgba(255, 210, 138, 0.1); color: #ffd28a; border: 1px solid rgba(255, 210, 138, 0.2); padding: 12px 32px; border-radius: 9999px; font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+                    TIDAK PASTI ({conf_pct}%)
+                </div>
+            </div>
+            """
+            panel_border = "rgba(255, 210, 138, 0.2)"
 
-        # Sanitize user input for safe HTML embedding
-        safe_input = input_text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-        safe_penjelasan = penjelasan.replace("**", "").replace("<", "&lt;").replace(">", "&gt;")
+        st.markdown(badge_html, unsafe_allow_html=True)
 
-        # 1) Verdict Header
-        st.markdown(f'<div class="result-header {css_cls}"><div class="verdict-icon {css_cls}">{icon}</div><div><div class="verdict-label {css_cls}">Hasil Analisis AI</div><div class="verdict-title {css_cls}">{verdict}</div><div class="verdict-summary">{summary}</div></div></div>', unsafe_allow_html=True)
+        # Ringkasan Analisis Medis Card
+        st.markdown(f"""
+        <div class="glass-panel" style="border-color: {panel_border};">
+            <h4 style="margin-top: 0; margin-bottom: 12px; color: #b7c4ff;">Penjelasan Medis</h4>
+            <p style="color: #e0e3e5; line-height: 1.6; margin: 0;">{penjelasan}</p>
+            <p style="color: #8d90a2; font-size: 0.75rem; margin-top: 16px; margin-bottom: 0;">
+                Tingkat Keyakinan sebesar {conf_pct}% menggunakan {model_info}
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
 
-        # 2) Quoted Input
-        st.markdown(f'<div class="result-quote"><span class="q-icon">💬</span><div><div class="q-label">Klaim yang Dianalisis</div><div class="q-text">&ldquo;{safe_input}&rdquo;</div></div></div>', unsafe_allow_html=True)
+        # Facts Supporting
+        if fakta:
+            st.markdown('<h3 style="margin-top: 24px; margin-bottom: 12px; color: #b9f1ff;">Fakta Ilmiah</h3>', unsafe_allow_html=True)
+            facts_list_html = "".join(f"<li>{f}</li>" for f in fakta)
+            st.markdown(f'<ul class="fact-list">{facts_list_html}</ul>', unsafe_allow_html=True)
 
-        # 3) Confidence Bar
-        st.markdown(f'<div style="margin-top:12px"><div class="section-title">Tingkat Keyakinan Model</div><div class="conf-bar-bg"><div class="conf-bar-fill" style="width:{conf_pct}%;background:linear-gradient(90deg,{conf_color}66,{conf_color})"></div></div><div class="conf-labels"><span>Rendah</span><span style="color:{conf_color};font-weight:700;font-size:0.85rem">{conf_pct}% Yakin</span><span>Tinggi</span></div></div>', unsafe_allow_html=True)
+        # Trusted Sources
+        if sumber:
+            st.markdown('<h3 style="margin-top: 24px; margin-bottom: 12px; color: #b9f1ff;">Rujukan Sumber Tepercaya</h3>', unsafe_allow_html=True)
+            sources_html = ", ".join(sumber)
+            st.markdown(f'<p style="color: #c3c5d9;">{sources_html}</p>', unsafe_allow_html=True)
 
-        # 4) Penjelasan Detail
-        st.markdown(f'<div style="margin-top:12px"><div class="section-title">Penjelasan Detail</div><div class="explanation-box">{safe_penjelasan}</div></div>', unsafe_allow_html=True)
-
-        # 5) Fakta Pendukung
-        fi = '<span class="icon" style="color:#ff5555">✕</span>' if verdict == "HOAKS" else '<span class="icon" style="color:#00e898">✓</span>'
-        items_html = "".join(f"<li>{fi}<span>{f}</span></li>" for f in fakta)
-        st.markdown(f'<div style="margin-top:12px"><div class="section-title">Fakta Pendukung</div><ul class="fact-list">{items_html}</ul></div>', unsafe_allow_html=True)
-
-        # 6) Sumber Terpercaya
-        tags_html = "".join(f'<span class="source-tag">{s}</span>' for s in sumber)
-        st.markdown(f'<div style="margin-top:12px"><div class="section-title">Sumber Terpercaya</div><div class="source-tags">{tags_html}</div></div>', unsafe_allow_html=True)
-
-        # 7) Meta Footer
-        st.markdown(f'<div class="result-meta"><span>Dianalisis pada {now}</span><span>{word_count} kata &middot; {char_count} karakter &middot; Model: IndoBERT v2</span></div>', unsafe_allow_html=True)
+        now = datetime.now().strftime("%d %B %Y, %H.%M WIB")
+        st.caption(f"Analisis selesai pada {now}")
 
     else:
-        st.markdown('<div class="hc-empty"><div class="empty-icon">🔍</div><div class="empty-title">Belum Ada Analisis</div><div class="empty-sub">Masukkan klaim atau informasi kesehatan di atas, lalu tekan <strong style="color:#ffffff">Analisis Sekarang</strong> untuk melihat hasilnya.</div></div>', unsafe_allow_html=True)
+        st.info("Hasil analisis belum keluar. Silakan masukkan pesan kesehatan pada kolom di atas, lalu klik tombol 'Mulai Analisis' untuk memeriksa kebenarannya.")
 
-# ══════════════════════════════════════════════
-#  PAGE 4 – ABOUT / DOCUMENTATION
-# ══════════════════════════════════════════════
 def page_about():
-    st.markdown('<section class="hc-hero"><h1>Tentang <span>CekKlaim.id</span></h1></section>', unsafe_allow_html=True)
+    st.markdown('<h1 class="highlight-text">Tentang Platform CekKlaim.id</h1>', unsafe_allow_html=True)
+    st.markdown('<p style="color: #c3c5d9;">Kisah perjuangan kami di balik layar dan cara kerja sistem pintar kami untuk melindungi keluarga Anda.</p>', unsafe_allow_html=True)
+
+    # 1. Kisah di Balik Layar (Why)
     st.markdown("""
-    ### 🧠 Penjelasan Model
-    Aplikasi ini menggunakan **IndoBERT** (`indobenchmark/indobert-base-p2`), sebuah model transformer
-    bahasa Indonesia yang telah melalui proses *fine-tuning* pada ribuan data klaim kesehatan.
+    <div class="glass-panel">
+        <h4 style="margin-top: 0; margin-bottom: 12px; color: #b7c4ff; font-size: 1.25rem;">Mengapa Kami Membuat CekKlaim.id?</h4>
+        <p style="color: #c3c5d9; line-height: 1.7; margin: 0; font-size: 0.95rem;">
+            Ide pembuatan CekKlaim.id bermula dari kekhawatiran setiap hari. Kami sering melihat orang tua, kerabat, hingga teman dekat membagikan tips kesehatan yang menyesatkan di grup WhatsApp keluarga seperti meminum cairan mentah berbahaya atau menghindari obat resep dokter. Misinformasi kesehatan seperti ini bukan sekadar berita bohong biasa, melainkan ancaman nyata bagi keselamatan jiwa. Dari situlah kami tergerak untuk melahirkan CekKlaim.id sebagai wadah verifikasi informasi medis yang andal namun sangat mudah dipahami oleh siapa saja, bahkan bagi orang awam sekalipun.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
-    **Pipeline:**
-    1. **Data Preprocessing** — Lowercase, hapus URL & karakter khusus, normalisasi slang.
-    2. **Feature Engineering** — Tokenisasi menggunakan tokenizer IndoBERT (max_length=64).
-    3. **Training** — Fine-tuning dengan PyTorch & HuggingFace Transformers.
-    4. **Inference** — Klasifikasi biner real-time pada aplikasi Streamlit.
-
-    ---
-    ### 📈 Metrik Evaluasi
-
-    | Metrik | Skor |
-    |--------|------|
-    | **Akurasi** | 100% |
-    | **F1-Score** | 1.00 |
-    | **Precision** | 1.00 |
-    | **Recall** | 1.00 |
-
-    > ⚠️ **Catatan:** Performa 100% dipengaruhi oleh *shortcut learning*. Lihat EDA Dashboard.
-
-    ---
-    ### 🔧 Cara Penggunaan
-    1. Buka menu **Prediction / Analysis** di sidebar.
-    2. Masukkan teks berupa klaim, opini, atau informasi medis.
-    3. Klik **Analisis Sekarang**.
-    4. Lihat hasil verifikasi, tingkat keyakinan, dan fakta pendukungnya.
-
-    ---
-    ### 👥 Informasi Tim
-    - **Nama Tim:** Try Dulu Deh
-    - **Anggota:** Arneta Alifiana, Laula Fatimatusyifa
-    - **Kompetisi:** GWE 2026 Data Science Challenge
-    """)
-
+    # 2. Bagaimana AI Kami Bekerja (How)
+    st.markdown("""
+    <div class="glass-panel">
+        <h4 style="margin-top: 0; margin-bottom: 16px; color: #b7c4ff; font-size: 1.25rem;">Bagaimana Cara Sistem Memeriksa Kebenaran Pesan Anda?</h4>
+        <p style="color: #c3c5d9; line-height: 1.6; margin-bottom: 20px; font-size: 0.95rem;">
+            Agar mendapatkan hasil analisis dengan tingkat akurasi tinggi layaknya seorang dokter, sistem pintar kami bekerja dengan empat tahapan terstruktur berikut
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 16px; border-radius: 12px;">
+                <strong style="color: #b9f1ff; font-size: 1rem; display: block; margin-bottom: 6px;">1. Menormalisasi Bahasa Chat</strong>
+                <span style="color: #c3c5d9; font-size: 0.88rem; line-height: 1.5; display: block;">
+                    Sebelum dianalisis, sistem merapikan singkatan, ejaan tidak baku, dan bahasa gaul yang sering digunakan di aplikasi percakapan sehari hari agar tidak ada salah paham makna kalimat.
+                </span>
+            </div>
+            <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 16px; border-radius: 12px;">
+                <strong style="color: #b9f1ff; font-size: 1rem; display: block; margin-bottom: 6px;">2. Membuka Rujukan Resmi Kemenkes & WHO (RAG)</strong>
+                <span style="color: #c3c5d9; font-size: 0.88rem; line-height: 1.5; display: block;">
+                    Seperti asisten pintar, sistem kami langsung mencari artikel referensi medis paling cocok dari database resmi WHO dan Kemenkes RI yang telah kami kumpulkan untuk mencocokkan fakta ilmiah terbaru.
+                </span>
+            </div>
+            <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 16px; border-radius: 12px;">
+                <strong style="color: #b9f1ff; font-size: 1rem; display: block; margin-bottom: 6px;">3. Uji Kebohongan dan Logika Negasi</strong>
+                <span style="color: #c3c5d9; font-size: 0.88rem; line-height: 1.5; display: block;">
+                    Sistem membandingkan logika kalimat. Jika referensi ilmiah menyatakan suatu bahan tidak menyebabkan pembekuan darah, sedangkan pesan yang Anda tempel tertulis menyebabkan pembekuan darah, sistem akan mendeteksi kontradiksi makna ini dan segera menandainya sebagai HOAKS.
+                </span>
+            </div>
+            <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 16px; border-radius: 12px;">
+                <strong style="color: #b9f1ff; font-size: 1rem; display: block; margin-bottom: 6px;">4. Prediksi Pintar (Klasifikasi Neural Network)</strong>
+                <span style="color: #c3c5d9; font-size: 0.88rem; line-height: 1.5; display: block;">
+                    Jika klaim kesehatan yang Anda tanyakan sangat baru dan belum tercatat di database medis resmi, sistem pintar kami akan mempelajari pola struktur bahasanya untuk mengukur seberapa besar kemungkinan pesan tersebut bernada hoaks atau fakta.
+                </span>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────
 #  NAVIGATION & MAIN
 # ─────────────────────────────────────────────
-st.markdown('<div class="hc-page">', unsafe_allow_html=True)
-
-st.sidebar.markdown("""
-<div style="display:flex;align-items:center;gap:12px;font-size:1.6rem;font-weight:900;color:#1e293b;margin-bottom:28px;letter-spacing:-0.5px;">
-  <div style="width:38px;height:38px;background:#2563eb; color:#ffffff !important;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#000;">🛡️</div>
-  <span style="font-weight:600;letter-spacing:-0.5px;">CekKlaim<span style="color:#888;">.id</span></span>
-</div>
-""", unsafe_allow_html=True)
+st.sidebar.markdown('<h2 style="color: #b7c4ff; font-size: 1.5rem; margin-top: 0; margin-bottom: 24px; font-weight: 800; font-family: \'Plus Jakarta Sans\', sans-serif;">CekKlaim.id</h2>', unsafe_allow_html=True)
 
 page = st.sidebar.radio(
     "Navigasi Aplikasi",
-    ["Halaman Utama", "Dashboard Analisis", "Cek Fakta (AI)", "Tentang Platform"]
+    ["Halaman Utama", "Dashboard Analisis", "Cek Klaim", "Tentang Platform"]
 )
 
 if page == "Halaman Utama":
     page_home()
 elif page == "Dashboard Analisis":
     page_eda()
-elif page == "Cek Fakta (AI)":
+elif page == "Cek Klaim":
     page_prediction()
 elif page == "Tentang Platform":
     page_about()
 
-st.markdown("""
-<footer class="hc-footer">
-  <span>© 2026 CekKlaim.id — GWE 2026 Data Science Challenge</span>
-  <span>Data bersumber dari WHO, Kemenkes RI, Mayo Clinic, dan IDAI</span>
-</footer>
-</div>
-""", unsafe_allow_html=True)
+st.markdown('<div class="footer-text">© 2026 CekKlaim.id | GWE 2026 Data Science Challenge | Data bersumber dari WHO, Kemenkes RI, Mayo Clinic, dan IDAI</div>', unsafe_allow_html=True)

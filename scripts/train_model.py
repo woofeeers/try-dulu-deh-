@@ -1,180 +1,134 @@
 import os
-os.environ["HF_HOME"] = "E:/huggingface_cache"
 import re
 import string
-import logging
-import warnings
 import pandas as pd
 import numpy as np
 import torch
-from transformers import (
-    AutoTokenizer, 
-    AutoModelForSequenceClassification, 
-    Trainer, 
-    TrainingArguments,
-    TrainerCallback
-)
-from sklearn.metrics import accuracy_score, precision_recall_fscore_support
+import torch.nn as nn
+import torch.optim as optim
+import pickle
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics import classification_report, accuracy_score
 
-# Mute warnings and default logging to keep output clean
-warnings.filterwarnings("ignore")
-logging.getLogger("transformers").setLevel(logging.ERROR)
-
-# 1. Preprocessing helper function
-def preprocess_text(text, slang_dict, remove_bias=True):
+# 1. Fully clean text, removing all punctuation and cheat prefix words
+def clean_text_fully(text, slang_dict):
     if not isinstance(text, str):
         return ""
     text = text.lower().strip()
-    if remove_bias:
-        text = re.sub(r'^(salah|hoaks|keliru|klarifikasi)\b\s*', '', text)
-        text = re.sub(r'^\[(salah|hoaks|keliru|klarifikasi)\]\s*', '', text)
-        text = text.replace("turnbackhoax.id", "")
+    
+    # Remove punctuation first so we can remove words cleanly
     text = text.translate(str.maketrans('', '', string.punctuation + string.digits))
+    
+    # Remove cheat/bias words completely from the text
+    bias_words = ['salah', 'hoaks', 'hoax', 'keliru', 'klarifikasi', 'turnbackhoaxid', 'turnbackhoax']
     words = text.split()
-    normalized = [slang_dict.get(w, w) for w in words]
-    return " ".join(normalized)
+    cleaned_words = [slang_dict.get(w, w) for w in words if w not in bias_words]
+    return " ".join(cleaned_words)
 
-# 2. PyTorch Dataset class
-class HoaxDataset(torch.utils.data.Dataset):
-    def __init__(self, encodings, labels):
-        self.encodings = encodings
-        self.labels = labels
-
-    def __getitem__(self, idx):
-        item = {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
-        item['labels'] = torch.tensor(self.labels[idx])
-        return item
-
-    def __len__(self):
-        return len(self.labels)
-
-# 3. Compute metrics helper
-def compute_metrics(pred):
-    labels = pred.label_ids
-    preds = pred.predictions.argmax(-1)
-    # Ensure average='binary' is safe by using zero_division
-    precision, recall, f1, _ = precision_recall_fscore_support(labels, preds, average='binary', zero_division=0)
-    acc = accuracy_score(labels, preds)
-    return {
-        'accuracy': acc,
-        'f1': f1,
-        'precision': precision,
-        'recall': recall
-    }
-
-# 4. Custom callback for clean output formatting
-class CustomLoggingCallback(TrainerCallback):
-    def __init__(self):
+# 2. PyTorch MLP Network Architecture
+class HoaxMLP(nn.Module):
+    def __init__(self, input_dim):
         super().__init__()
-        self.last_train_loss = None
-
-    def on_log(self, args, state, control, logs=None, **kwargs):
-        if logs is not None and "loss" in logs:
-            self.last_train_loss = logs["loss"]
-
-    def on_evaluate(self, args, state, control, metrics=None, **kwargs):
-        if metrics is not None:
-            epoch = state.epoch
-            epoch_str = f"{int(round(epoch))}" if epoch is not None else "1"
-            train_loss_str = f"{self.last_train_loss:.2f}" if self.last_train_loss is not None else "0.00"
-            
-            val_loss = metrics.get("eval_loss", 0.0)
-            val_loss_str = f"{val_loss:.2f}" if isinstance(val_loss, float) else "0.00"
-            
-            acc = metrics.get("eval_accuracy", 0.0)
-            acc_str = f"{acc:.2f}" if isinstance(acc, float) else "0.00"
-            
-            precision = metrics.get("eval_precision", 0.0)
-            precision_str = f"{precision:.2f}" if isinstance(precision, float) else "0.00"
-            
-            recall = metrics.get("eval_recall", 0.0)
-            recall_str = f"{recall:.2f}" if isinstance(recall, float) else "0.00"
-            
-            f1 = metrics.get("eval_f1", 0.0)
-            f1_str = f"{f1:.2f}" if isinstance(f1, float) else "0.00"
-            
-            print(f"\nEpoch {epoch_str}/3")
-            print(f"Training Loss : {train_loss_str}")
-            print(f"Validation Loss : {val_loss_str}")
-            print(f"Accuracy : {acc_str}")
-            print(f"Precision : {precision_str}")
-            print(f"Recall : {recall_str}")
-            print(f"F1 Score : {f1_str}")
+        self.net = nn.Sequential(
+            nn.Linear(input_dim, 128),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(128, 32),
+            nn.ReLU(),
+            nn.Linear(32, 2)
+        )
+        
+    def forward(self, x):
+        return self.net(x)
 
 def main():
-    # Load dataset splits
-    train_df = pd.read_csv("data/train.csv").sample(n=32, random_state=42).reset_index(drop=True)
-    val_df = pd.read_csv("data/val.csv").sample(n=16, random_state=42).reset_index(drop=True)
-    test_df = pd.read_csv("data/test.csv").sample(n=16, random_state=42).reset_index(drop=True)
+    print("Loading dataset splits...")
+    train_df = pd.read_csv("data/train.csv")
+    val_df = pd.read_csv("data/val.csv")
+    test_df = pd.read_csv("data/test.csv")
 
-    # Load slang lexicon
+    print("Loading slang dictionary...")
     lexicon_df = pd.read_csv("data/colloquial-indonesian-lexicon.csv")
     slang_dict = dict(zip(lexicon_df['slang'], lexicon_df['formal']))
 
-    # Preprocess text
-    train_df['clean_text'] = train_df['text'].apply(lambda x: preprocess_text(x, slang_dict))
-    val_df['clean_text'] = val_df['text'].apply(lambda x: preprocess_text(x, slang_dict))
-    test_df['clean_text'] = test_df['text'].apply(lambda x: preprocess_text(x, slang_dict))
+    print("Cleaning text inputs...")
+    train_df['clean'] = train_df['text'].apply(lambda x: clean_text_fully(x, slang_dict))
+    val_df['clean'] = val_df['text'].apply(lambda x: clean_text_fully(x, slang_dict))
+    test_df['clean'] = test_df['text'].apply(lambda x: clean_text_fully(x, slang_dict))
 
-    # Load tokenizer
-    model_name = "indobenchmark/indobert-base-p2"
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    print("Extracting TF-IDF features...")
+    vectorizer = TfidfVectorizer(ngram_range=(1, 2), min_df=2, max_features=5000)
+    X_train = vectorizer.fit_transform(train_df['clean']).toarray()
+    X_val = vectorizer.transform(val_df['clean']).toarray()
+    X_test = vectorizer.transform(test_df['clean']).toarray()
 
-    # Tokenize encodings
-    train_encodings = tokenizer(list(train_df['clean_text']), truncation=True, padding=True, max_length=64)
-    val_encodings = tokenizer(list(val_df['clean_text']), truncation=True, padding=True, max_length=64)
-    test_encodings = tokenizer(list(test_df['clean_text']), truncation=True, padding=True, max_length=64)
+    y_train = train_df['label'].values
+    y_val = val_df['label'].values
+    y_test = test_df['label'].values
 
-    # Build datasets
-    train_dataset = HoaxDataset(train_encodings, list(train_df['label']))
-    val_dataset = HoaxDataset(val_encodings, list(val_df['label']))
-    test_dataset = HoaxDataset(test_encodings, list(test_df['label']))
+    input_dim = X_train.shape[1]
+    model = HoaxMLP(input_dim)
 
-    # Load model
-    model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=2)
+    # 3. Class Weights to balance loss (ratio 9:1 in dataset)
+    num_hoax = np.sum(y_train == 0)
+    num_valid = np.sum(y_train == 1)
+    total = len(y_train)
+    weights = [total / (2.0 * num_hoax), total / (2.0 * num_valid)]
+    class_weights = torch.tensor(weights, dtype=torch.float32)
+    criterion = nn.CrossEntropyLoss(weight=class_weights)
 
-    # Configure training arguments (silencing logs and progress bars)
-    training_args = TrainingArguments(
-        output_dir='./results',
-        num_train_epochs=3,
-        per_device_train_batch_size=16,
-        per_device_eval_batch_size=16,
-        warmup_steps=100,
-        weight_decay=0.01,
-        logging_dir='./logs',
-        logging_strategy="epoch",
-        evaluation_strategy="epoch",
-        save_strategy="epoch",
-        load_best_model_at_end=True,
-        metric_for_best_model="accuracy",
-        greater_is_better=True,
-        disable_tqdm=True,
-        report_to="none",
-        fp16=torch.cuda.is_available(),
-    )
+    optimizer = optim.Adam(model.parameters(), lr=0.005)
 
-    # Initialize trainer with custom callback
-    custom_cb = CustomLoggingCallback()
-    trainer = Trainer(
-        model=model,
-        args=training_args,
-        train_dataset=train_dataset,
-        eval_dataset=val_dataset,
-        compute_metrics=compute_metrics,
-        callbacks=[custom_cb]
-    )
+    # Convert to PyTorch tensors
+    X_train_t = torch.tensor(X_train, dtype=torch.float32)
+    y_train_t = torch.tensor(y_train, dtype=torch.long)
+    X_val_t = torch.tensor(X_val, dtype=torch.float32)
+    y_val_t = torch.tensor(y_val, dtype=torch.long)
+    X_test_t = torch.tensor(X_test, dtype=torch.float32)
 
-    # Overwrite the callbacks handler to contain ONLY our custom callback
-    trainer.callback_handler.callbacks = [custom_cb]
+    print("Training MLP on CPU with Balanced Loss...")
+    epochs = 60
+    for epoch in range(epochs):
+        model.train()
+        optimizer.zero_grad()
+        outputs = model(X_train_t)
+        loss = criterion(outputs, y_train_t)
+        loss.backward()
+        optimizer.step()
+        
+        # Validation evaluation step
+        if (epoch + 1) % 10 == 0:
+            model.eval()
+            with torch.no_grad():
+                val_outputs = model(X_val_t)
+                val_loss = criterion(val_outputs, y_val_t)
+                val_preds = torch.argmax(val_outputs, dim=1).numpy()
+                val_acc = accuracy_score(y_val, val_preds)
+            print(f"Epoch {epoch+1}/{epochs} - Train Loss: {loss.item():.4f} - Val Loss: {val_loss.item():.4f} - Val Acc: {val_acc*100:.2f}%")
 
-    # Train model
-    trainer.train()
+    # 4. Final Evaluation
+    model.eval()
+    with torch.no_grad():
+        test_outputs = model(X_test_t)
+        preds = torch.argmax(test_outputs, dim=1).numpy()
 
-    # Save model and tokenizer to destination
-    output_dir = "models/indobert_hoax_model"
+    print("\nMLP Training Complete!")
+    print(f"MLP Final Accuracy on Test Set: {accuracy_score(y_test, preds)*100:.2f}%")
+    print("\nClassification Report:")
+    print(classification_report(y_test, preds, zero_division=0))
+
+    # 5. Exporting trained model
+    output_dir = "models/mlp_model"
     os.makedirs(output_dir, exist_ok=True)
-    model.save_pretrained(output_dir)
-    tokenizer.save_pretrained(output_dir)
+    
+    print(f"Saving model weights to {output_dir}/model.pt...")
+    torch.save(model.state_dict(), os.path.join(output_dir, "model.pt"))
+    
+    print(f"Saving TF-IDF vectorizer to {output_dir}/vectorizer.pkl...")
+    with open(os.path.join(output_dir, "vectorizer.pkl"), "wb") as f:
+        pickle.dump(vectorizer, f)
+        
+    print("All artifacts exported successfully!")
 
 if __name__ == "__main__":
     main()

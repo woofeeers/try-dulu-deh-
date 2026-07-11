@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Inter:wght@400;500;700&amp;family=Source+Serif+4:ital@1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #101415;
+            color: #e0e3e5;
+            overflow-x: hidden;
+        }
+
+        .glass-card {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+        }
+
+        .cinematic-glow {
+            box-shadow: 0 0 30px rgba(0, 82, 255, 0.15);
+        }
+
+        .truth-engine-input:focus {
+            outline: none;
+            border-bottom: 2px solid #00e0ff;
+            box-shadow: 0 4px 12px -2px rgba(0, 224, 255, 0.3);
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.5; }
+        }
+
+        .ambient-glow {
+            background: radial-gradient(circle at 50% 50%, rgba(0, 82, 255, 0.1) 0%, transparent 70%);
+            animation: pulse-slow 8s infinite ease-in-out;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#414658",
+                        "surface-variant": "#323537",
+                        "background": "#101415",
+                        "on-secondary-container": "#005f6d",
+                        "error-container": "#93000a",
+                        "surface-dim": "#101415",
+                        "secondary-container": "#00e0ff",
+                        "surface-container-high": "#272a2c",
+                        "on-error": "#690005",
+                        "inverse-on-surface": "#2d3133",
+                        "surface-tint": "#b7c4ff",
+                        "secondary-fixed": "#a5eeff",
+                        "on-secondary": "#00363f",
+                        "on-tertiary-fixed": "#161b2b",
+                        "inverse-surface": "#e0e3e5",
+                        "on-surface": "#e0e3e5",
+                        "on-primary-fixed": "#001452",
+                        "tertiary-fixed": "#dee1f7",
+                        "surface-bright": "#363a3b",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#004e5a",
+                        "tertiary-fixed-dim": "#c2c6db",
+                        "on-primary-fixed-variant": "#0038b6",
+                        "on-tertiary": "#2b3040",
+                        "surface-container-highest": "#323537",
+                        "tertiary-container": "#616578",
+                        "primary-fixed": "#dde1ff",
+                        "on-primary": "#002682",
+                        "outline-variant": "#434656",
+                        "secondary-fixed-dim": "#00daf8",
+                        "on-secondary-fixed": "#001f25",
+                        "on-tertiary-container": "#e0e3f9",
+                        "on-primary-container": "#dfe3ff",
+                        "primary": "#b7c4ff",
+                        "on-surface-variant": "#c3c5d9",
+                        "surface-container": "#1d2022",
+                        "surface-container-lowest": "#0b0f10",
+                        "outline": "#8d90a2",
+                        "primary-container": "#0052ff",
+                        "surface": "#101415",
+                        "tertiary": "#c2c6db",
+                        "secondary": "#b9f1ff",
+                        "inverse-primary": "#004ced",
+                        "surface-container-low": "#191c1e",
+                        "primary-fixed-dim": "#b7c4ff",
+                        "on-background": "#e0e3e5",
+                        "error": "#ffb4ab"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "element-gap": "24px",
+                        "container-padding": "40px",
+                        "section-gap": "80px",
+                        "unit": "8px",
+                        "glass-padding": "32px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "body-md": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "display-lg-mobile": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-lg": ["Inter"],
+                        "accent-italic": ["\"Source Serif 4\""]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "display-lg-mobile": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "accent-italic": ["16px", {"lineHeight": "1.5", "letterSpacing": "0.02em", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="font-body-md text-on-surface">
+<!-- Cinematic Background -->
+<div class="fixed inset-0 z-[-1]">
+<div class="w-full h-full object-cover opacity-20" data-alt="A deep, cinematic bokeh background of a high-tech modern medical laboratory." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAlUJ5uqkaCoFB217VRX5sIpWhlMyiGTdNDiLxV8EdpG43i7nx25i6Voa3qPXfJgYY3XNWeZGW4VJm5sAcXuj0yQbc059PO-vBD7c2RcvMfrXJQit7JjcxbaxPopQXW_ajXbaV5UIW1rrbUggwCmP0oFqkoSDF61CLtgsdGkMMen1wqZ_Rd_PgoEh197CiazrEGN1b2UskxtzQGOlNDKKTKTrs6J6-sLTFNTdQIndGjZAEQYzjHVp7L')"></div>
+<div class="absolute inset-0 bg-gradient-to-b from-background via-background/80 to-background"></div>
+<div class="absolute inset-0 ambient-glow"></div>
+</div>
+<!-- Navigation -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-container-padding h-20 bg-surface/8 backdrop-blur-xl border-b border-white/10">
+<div class="flex items-center gap-12">
+<span class="font-display-lg text-headline-md font-bold text-primary tracking-tight">CekKlaim.id</span>
+<nav class="hidden md:flex gap-8 items-center">
+<a class="text-on-surface-variant hover:text-secondary transition-all font-label-caps text-label-caps" href="#">Tentang Kami</a>
+<a class="text-secondary font-bold border-b-2 border-secondary font-label-caps text-label-caps transition-all" href="#">Cek Klaim</a>
+<a class="text-on-surface-variant hover:text-secondary transition-all font-label-caps text-label-caps" href="#">Dashboard Analisis</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-white/10 rounded-full transition-all">
+<span class="material-symbols-outlined text-primary">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-white/20">
+<img class="w-full h-full object-cover" data-alt="User Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIE2rVNbknatYixzCSqSHnDz3HZ3Beoh0nQpQHp2mR2F-8SqbS7bM8JYpL8lsLYXutrsEiuUMTzqNgnO1g_CHg3klHEvGuJaoaECdo_dJG9UgrWxQcS1k-hQi4XXQja534omVf6umyEK-sSasbnW6OVWEnv2jnZnO9ZDzQ6i0unctU_ucUMRwE-GMXvGW4C9vRQevJ0SwBoCa-13-HtBWOLtd99V6ChHN2IRNKdWLAjK-yNWtHULIQ"/>
+</div>
+</div>
+</header>
+<main class="pt-32 pb-20 px-container-padding max-w-5xl mx-auto">
+<!-- Title & Instructions -->
+<section class="text-center mb-12">
+<h1 class="font-display-lg text-display-lg text-primary mb-4">Verifikasi Klaim Kesehatan</h1>
+<p class="font-accent-italic text-accent-italic text-secondary max-w-2xl mx-auto">
+                Masukkan klaim medis atau berita kesehatan untuk dianalisis oleh mesin kebenaran bertenaga AI kami dan verifikasi pakar medis.
+            </p>
+</section>
+<!-- Text Input Area -->
+<section class="mb-element-gap">
+<div class="glass-card p-glass-padding rounded-2xl cinematic-glow relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-secondary to-transparent opacity-30"></div>
+<div class="flex flex-col gap-6">
+<div class="relative">
+<span class="absolute left-0 top-1/2 -translate-y-1/2 material-symbols-outlined text-secondary-container text-3xl">fact_check</span>
+<input class="w-full bg-transparent border-0 border-b border-white/20 pl-12 py-4 truth-engine-input font-body-lg text-body-lg text-on-surface placeholder:text-on-surface-variant/40" placeholder="Tempelkan teks atau link klaim kesehatan di sini..." type="text"/>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex gap-4">
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 hover:bg-white/5 transition-all text-label-caps font-label-caps">
+<span class="material-symbols-outlined text-sm">attachment</span> Lampirkan Sumber
+                            </button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 hover:bg-white/5 transition-all text-label-caps font-label-caps">
+<span class="material-symbols-outlined text-sm">language</span> Tempel URL
+                            </button>
+</div>
+<button class="bg-primary-container text-on-primary-container px-8 py-3 rounded-full font-bold shadow-[0_0_20px_rgba(0,82,255,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 hover:bg-secondary-container hover:text-on-secondary-container hover:shadow-[0_0_30px_rgba(0,224,255,0.5)] active:bg-secondary active:shadow-none">
+                            Mulai Analisis <span class="material-symbols-outlined">rocket_launch</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Validation Result Badge -->
+<section class="flex justify-center mb-element-gap">
+<div class="bg-error-container/20 text-error border border-error/30 px-10 py-4 rounded-full flex items-center gap-3 animate-pulse">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">error</span>
+<span class="font-display-lg text-headline-md font-bold tracking-tight">HOAX / TIDAK VALID</span>
+</div>
+</section>
+<!-- Detailed Explanation -->
+<section class="mb-section-gap">
+<div class="glass-card p-glass-padding rounded-3xl cinematic-glow">
+<div class="flex flex-col gap-6">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-error text-3xl">info</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Ringkasan Analisis Medis</h3>
+</div>
+<div class="space-y-4 font-body-md text-body-md text-on-surface-variant">
+<p>Klaim ini dikategorikan sebagai <strong>Hoax / Tidak Valid</strong> karena tidak memiliki dasar ilmiah yang kuat. Meskipun bawang putih memiliki manfaat kesehatan umum, klaim bahwa ia dapat menghentikan pembelahan sel kanker secara instan adalah misinformasi berbahaya yang dapat menunda pengobatan medis yang terbukti secara klinis.</p>
+<p>Pola misinformasi yang terdeteksi meliputi penggunaan bahasa bombastis, eksploitasi ketakutan pasien, dan ketiadaan referensi jurnal ilmiah yang diakui secara internasional. Konsultasikan selalu dengan tenaga medis profesional sebelum mengambil keputusan terkait pengobatan penyakit serius.</p>
+<div class="pt-4 border-t border-white/10">
+<p class="italic text-primary border-l-2 border-primary pl-4">
+                        "Klaim penyembuhan instan tanpa protokol medis terstandarisasi adalah ciri khas penipuan kesehatan yang dapat berakibat fatal bagi pasien." 
+                        <span class="block mt-1 font-bold">— Dr. Sarah Wijaya, Onkolog.</span>
+</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Trusted Sources Section -->
+<section>
+<div class="flex items-center gap-4 mb-8">
+<h2 class="font-headline-md text-headline-md text-secondary">Sumber Terpercaya</h2>
+<div class="h-px bg-gradient-to-r from-secondary/30 to-transparent flex-1"></div>
+</div>
+<div class="flex flex-wrap gap-4">
+<div class="glass-card px-6 py-2 rounded-full flex items-center gap-2 hover:bg-white/10 transition-all cursor-pointer border border-white/20">
+<span class="material-symbols-outlined text-secondary text-sm">menu_book</span>
+<span class="font-bold text-sm">WHO</span>
+</div>
+<div class="glass-card px-6 py-2 rounded-full flex items-center gap-2 hover:bg-white/10 transition-all cursor-pointer border border-white/20">
+<span class="material-symbols-outlined text-secondary text-sm">clinical_notes</span>
+<span class="font-bold text-sm">The Lancet</span>
+</div>
+<div class="glass-card px-6 py-2 rounded-full flex items-center gap-2 hover:bg-white/10 transition-all cursor-pointer border border-white/20">
+<span class="material-symbols-outlined text-secondary text-sm">health_and_safety</span>
+<span class="font-bold text-sm">Kemenkes RI</span>
+</div>
+<div class="glass-card px-6 py-2 rounded-full flex items-center gap-2 hover:bg-white/10 transition-all cursor-pointer border border-white/20">
+<span class="material-symbols-outlined text-secondary text-sm">description</span>
+<span class="font-bold text-sm">Journal of Oncology</span>
+</div>
+</div>
+</section>
+</main>
+<footer class="mt-section-gap py-12 px-container-padding border-t border-white/10 bg-surface-container-low/40 backdrop-blur-md">
+<div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="flex flex-col gap-2">
+<span class="font-display-lg text-headline-md font-bold text-primary">CekKlaim.id</span>
+<p class="text-on-surface-variant text-sm">© 2024 Precision Fact-Check for Global Health Integrity.</p>
+</div>
+<div class="flex gap-8">
+<a class="text-on-surface-variant hover:text-secondary transition-colors font-label-caps text-label-caps" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors font-label-caps text-label-caps" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors font-label-caps text-label-caps" href="#">Contact Support</a>
+</div>
+</div>
+</footer>
+<script>
+        // Micro-interactions for the truth engine input
+        const input = document.querySelector('.truth-engine-input');
+        const glassCard = input.closest('.glass-card');
+
+        input.addEventListener('focus', () => {
+            glassCard.classList.add('shadow-[0_0_50px_rgba(0,224,255,0.15)]');
+            glassCard.style.borderColor = 'rgba(0, 224, 255, 0.4)';
+        });
+
+        input.addEventListener('blur', () => {
+            glassCard.classList.remove('shadow-[0_0_50px_rgba(0,224,255,0.15)]');
+            glassCard.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+        });
+
+        // Ambient glow mouse tracking
+        document.addEventListener('mousemove', (e) => {
+            const glow = document.querySelector('.ambient-glow');
+            const x = (e.clientX / window.innerWidth) * 100;
+            const y = (e.clientY / window.innerHeight) * 100;
+            glow.style.background = `radial-gradient(circle at ${x}% ${y}%, rgba(0, 82, 255, 0.1) 0%, transparent 70%)`;
+        });
+    </script>
+</body></html>
