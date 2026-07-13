@@ -220,6 +220,13 @@ def predict(text: str, threshold: float = 0.85) -> dict:
     word_count = len(text.split())
     char_count = len(text)
     
+    STOPWORDS = {
+        "saya", "suka", "makan", "dan", "yang", "di", "ke", "dari", "untuk", "dengan",
+        "ini", "itu", "adalah", "yaitu", "dia", "mereka", "kita", "kami", "kamu", "akan",
+        "bisa", "dapat", "ada", "tidak", "bukan", "hanya", "saja", "atau", "juga", "sudah",
+        "belum", "telah", "mempunyai", "memiliki", "pada", "oleh", "bahwa", "seperti"
+    }
+    
     if all_facts:
         try:
             fact_texts = [preprocess_text(f["text"], slang_dict, remove_bias=True) for f in all_facts]
@@ -245,143 +252,149 @@ def predict(text: str, threshold: float = 0.85) -> dict:
                 candidates.sort(key=lambda x: x[0], reverse=True)
                 best_score, matched_fact = candidates[0]
                 
-                # Check if best similarity score is above the user-specified threshold
-                if best_score >= threshold:
-                    matched_label = matched_fact["label"]
-                    matched_text = matched_fact["text"].lower()
-                    
-                    is_negated, word = check_negation_contradiction(text, matched_text, slang_dict)
-                    
-                    if is_negated:
-                        classification = "HOAKS"
-                        explanation = (
-                            f"Klaim \"{text}\" bertentangan dengan rujukan medis resmi tentang \"{matched_fact['title']}\". "
-                            f"Berdasarkan data kesehatan terpercaya dari {matched_fact['source']}, pernyataan ini tidak benar karena terdapat pertentangan makna."
-                        )
-                        summary = f"Klaim ini bertentangan dengan rujukan medis tentang {matched_fact['title']}."
-                        fakta = [
-                            f"Rujukan medis resmi menyatakan hal yang sebaliknya mengenai topik {matched_fact['title']}.",
-                            f"Terdeteksi kontradiksi makna pada kata kunci '{word}' dibandingkan dengan data kesehatan tepercaya.",
-                            "Informasi ini terindikasi sebagai disinformasi atau mitos kesehatan.",
-                            f"Rujukan ilmiah didapatkan dari sumber resmi: {matched_fact['source']}."
-                        ]
-                        sumber = [matched_fact["source"]]
-                        return {"verdict": classification, "confidence": float(best_score), "summary": summary,
-                                "penjelasan": explanation, "fakta": fakta, "sumber": sumber,
-                                "word_count": word_count, "char_count": char_count, "input_text": text,
-                                "model_info": "Sistem Verifikasi Fakta Medis (RAG Lokal)"}
-                    
-                    has_contradiction = False
-                    found_words = []
-                    for word in CONTRADICTION_WORDS:
-                        if word in clean_query and word not in matched_text:
-                            has_contradiction = True
-                            found_words.append(word)
-                    
-                    if has_contradiction:
-                        classification = "HOAKS"
-                        explanation = (
-                            f"Klaim \"{text}\" bertentangan dengan fakta medis terpercaya tentang \"{matched_fact['title']}\". "
-                            f"Rujukan resmi dari {matched_fact['source']} menyatakan informasi yang berbeda secara kontradiktif (ditemukan kata: {found_words})."
-                        )
-                        summary = f"Klaim ini terindikasi HOAKS karena bertentangan dengan fakta medis {matched_fact['title']}."
-                        fakta = [
-                            f"Pernyataan tersebut bertentangan dengan data medis mengenai {matched_fact['title']}.",
-                            f"Ditemukan indikasi klaim berbahaya atau tidak aman (kata kunci: {found_words}).",
-                            "Selalu verifikasi informasi kesehatan dari institusi resmi.",
-                            f"Sumber data terpercaya: {matched_fact['source']}."
-                        ]
-                        sumber = [matched_fact["source"]]
-                    else:
-                        if matched_label == 0:
-                            classification = "HOAKS"
-                            explanation = (
-                                f"Klaim \"{text}\" serupa dengan hoaks atau disinformasi kesehatan yang telah tercatat sebelumnya: "
-                                f"\"{matched_fact['text']}\". Informasi ini tidak valid dan berpotensi menyesatkan."
-                            )
-                            summary = "Klaim serupa dengan catatan hoaks kesehatan yang telah diverifikasi sebelumnya."
-                            fakta = [
-                                "Klaim ini memiliki kemiripan tinggi dengan disinformasi yang sudah diklarifikasi.",
-                                "Tidak ada bukti medis ilmiah resmi yang mendukung pernyataan ini.",
-                                f"Klarifikasi hoaks ini bersumber dari {matched_fact['source']}.",
-                                "Selalu rujuk ke situs resmi kesehatan untuk informasi valid."
-                            ]
-                            sumber = [matched_fact["source"]]
-                        else:
-                            classification = "VALID"
-                            explanation = (
-                                f"Klaim \"{text}\" didukung oleh data kesehatan terpercaya mengenai \"{matched_fact['title']}\". "
-                                f"Informasi ini sejalan dengan referensi medis tepercaya dari {matched_fact['source']}."
-                            )
-                            summary = f"Klaim ini didukung oleh rujukan medis tepercaya mengenai {matched_fact['title']}."
-                            fakta = [
-                                f"Pernyataan ini terbukti konsisten dengan fakta medis resmi tentang {matched_fact['title']}.",
-                                "Sejalan dengan pedoman kesehatan klinis yang berlaku.",
-                                f"Informasi didukung oleh literatur dari {matched_fact['source']}.",
-                                "Aman digunakan sebagai referensi kesehatan umum."
-                            ]
-                            sumber = [matched_fact["source"]]
-                    
+                matched_label = matched_fact["label"]
+                matched_text = matched_fact["text"].lower()
+                
+                is_negated, word = check_negation_contradiction(text, matched_text, slang_dict)
+                
+                if is_negated:
+                    classification = "HOAKS"
+                    explanation = (
+                        f"Klaim \"{text}\" bertentangan dengan rujukan medis resmi tentang \"{matched_fact['title']}\". "
+                        f"Berdasarkan data kesehatan terpercaya dari {matched_fact['source']}, pernyataan ini tidak benar karena terdapat pertentangan makna."
+                    )
+                    summary = f"Klaim ini bertentangan dengan rujukan medis tentang {matched_fact['title']}."
+                    fakta = [
+                        f"Rujukan medis resmi menyatakan hal yang sebaliknya mengenai topik {matched_fact['title']}.",
+                        f"Terdeteksi kontradiksi makna pada kata kunci '{word}' dibandingkan dengan data kesehatan tepercaya.",
+                        "Informasi ini terindikasi sebagai disinformasi atau mitos kesehatan.",
+                        f"Rujukan ilmiah didapatkan dari sumber resmi: {matched_fact['source']}."
+                    ]
+                    sumber = [matched_fact["source"]]
                     return {"verdict": classification, "confidence": float(best_score), "summary": summary,
                             "penjelasan": explanation, "fakta": fakta, "sumber": sumber,
                             "word_count": word_count, "char_count": char_count, "input_text": text,
                             "model_info": "Sistem Verifikasi Fakta Medis (RAG Lokal)"}
-                else:
-                    # Ada rujukan, tapi skor kemiripan di bawah ambang batas minimum
+                
+                has_contradiction = False
+                found_words = []
+                for word in CONTRADICTION_WORDS:
+                    if word in clean_query and word not in matched_text:
+                        has_contradiction = True
+                        found_words.append(word)
+                
+                if has_contradiction:
+                    classification = "HOAKS"
                     explanation = (
-                        f"Informasi mengenai klaim \"{text}\" belum memiliki bukti yang cukup kuat di database rujukan kami. "
-                        f"Tingkat kecocokan terdekat hanya sebesar {best_score*100:.2f}%, di bawah ambang batas minimum {threshold*100:.2f}%, sehingga sistem tidak dapat memberikan keputusan verifikasi."
+                        f"Klaim \"{text}\" bertentangan dengan fakta medis terpercaya tentang \"{matched_fact['title']}\". "
+                        f"Rujukan resmi dari {matched_fact['source']} menyatakan informasi yang berbeda secara kontradiktif (ditemukan kata: {found_words})."
                     )
-                    summary = "Tingkat kecocokan rujukan di bawah ambang batas minimum."
+                    summary = f"Klaim ini terindikasi HOAKS karena bertentangan dengan fakta medis {matched_fact['title']}."
                     fakta = [
-                        f"Ditemukan referensi potensial mengenai '{matched_fact['title']}', tetapi tingkat kemiripannya terlalu rendah.",
-                        "Sistem menghindari pengambilan keputusan verifikasi tanpa bukti yang kuat demi mencegah misinformasi.",
-                        "Konsultasikan dengan dokter atau tenaga medis profesional untuk memverifikasi informasi ini secara klinis."
+                        f"Pernyataan tersebut bertentangan dengan data medis mengenai {matched_fact['title']}.",
+                        f"Ditemukan indikasi klaim berbahaya atau tidak aman (kata kunci: {found_words}).",
+                        "Selalu verifikasi informasi kesehatan dari institusi resmi.",
+                        f"Sumber data terpercaya: {matched_fact['source']}."
                     ]
                     sumber = [matched_fact["source"]]
-                    return {"verdict": "TIDAK DAPAT DIVERIFIKASI", "confidence": float(best_score), "summary": summary,
-                            "penjelasan": explanation, "fakta": fakta, "sumber": sumber,
-                            "word_count": word_count, "char_count": char_count, "input_text": text,
-                            "model_info": "Sistem Verifikasi Fakta Medis (RAG Lokal)"}
-            else:
-                # Tidak ada fakta sama sekali (candidates kosong)
+                else:
+                    if matched_label == 0:
+                        classification = "HOAKS"
+                        explanation = (
+                            f"Klaim \"{text}\" serupa dengan hoaks atau disinformasi kesehatan yang telah tercatat sebelumnya: "
+                            f"\"{matched_fact['text']}\". Informasi ini tidak valid dan berpotensi menyesatkan."
+                        )
+                        summary = "Klaim serupa dengan catatan hoaks kesehatan yang telah diverifikasi sebelumnya."
+                        fakta = [
+                            "Klaim ini memiliki kemiripan tinggi dengan disinformasi yang sudah diklarifikasi.",
+                            "Tidak ada bukti medis ilmiah resmi yang mendukung pernyataan ini.",
+                            f"Klarifikasi hoaks ini bersumber dari {matched_fact['source']}.",
+                            "Selalu rujuk ke situs resmi kesehatan untuk informasi valid."
+                        ]
+                        sumber = [matched_fact["source"]]
+                    else:
+                        classification = "VALID"
+                        explanation = (
+                            f"Klaim \"{text}\" didukung oleh data kesehatan terpercaya mengenai \"{matched_fact['title']}\". "
+                            f"Informasi ini sejalan dengan referensi medis tepercaya dari {matched_fact['source']}."
+                        )
+                        summary = f"Klaim ini didukung oleh rujukan medis tepercaya mengenai {matched_fact['title']}."
+                        fakta = [
+                            f"Pernyataan ini terbukti konsisten dengan fakta medis resmi tentang {matched_fact['title']}.",
+                            "Sejalan dengan pedoman kesehatan klinis yang berlaku.",
+                            f"Informasi didukung oleh literatur dari {matched_fact['source']}.",
+                            "Aman digunakan sebagai referensi kesehatan umum."
+                        ]
+                        sumber = [matched_fact["source"]]
+                
+                return {"verdict": classification, "confidence": float(best_score), "summary": summary,
+                        "penjelasan": explanation, "fakta": fakta, "sumber": sumber,
+                        "word_count": word_count, "char_count": char_count, "input_text": text,
+                        "model_info": "Sistem Verifikasi Fakta Medis (RAG Lokal)"}
+        except Exception as e:
+            pass
+
+    # --- FALLBACK TO LOCAL PYTORCH MLP MODEL (Debiased Deep Learning) ---
+    MEDICAL_KEYWORDS = {
+        "obat", "penyakit", "vaksin", "virus", "bakteri", "dokter", "medis", "klinis",
+        "kesehatan", "sakit", "paracetamol", "kanker", "tumor", "darah", "jantung",
+        "paru", "hati", "ginjal", "otak", "saraf", "tulang", "kulit", "mata", "telinga",
+        "tenggorokan", "hidung", "mulut", "gigi", "lambung", "usus", "rahim", "kehamilan",
+        "bayi", "anak", "lansia", "imunisasi", "infeksi", "radang", "luka", "nyeri",
+        "pusing", "demam", "batuk", "pilek", "sesak", "nafas", "asma", "alergi",
+        "diabetes", "hipertensi", "kolesterol", "stroke", "asam", "urat", "rematik",
+        "terapi", "operasi", "bedah", "resep", "apotek", "puskesmas", "suntik",
+        "infus", "kapsul", "tablet", "salep", "sirup", "dosis", "efek", "samping",
+        "gejala", "diagnosa", "terinfeksi", "penularan", "wabah", "pandemi", "epidemi",
+        "sanitasi", "higienis", "gizi", "nutrisi", "vitamin", "mineral", "diet",
+        "obesitas", "kolera", "disentri", "diare", "tifus", "malaria", "dbd", "demam",
+        "berdarah", "tbc", "tuberkulosis", "pneumonia", "bronkitis", "influenza",
+        "corona", "covid", "covid19", "sarscov2", "hiv", "aids", "sifilis", "gonore",
+        "herpes", "cacar", "campak", "rubella", "tetanus", "difteri", "pertusis",
+        "polio", "rabies", "antrax", "flu", "burung", "babi", "dbd", "chikungunya",
+        "ramuan", "herbal", "alami", "tradisional", "rebusan", "madu", "jahe", "kunyit",
+        "temulawak", "kencur", "sirih", "lemon", "bawang", "garam", "air", "hangat"
+    }
+    
+    cleaned_input_for_kw = clean_text_fully(text, slang_dict)
+    has_medical_keyword = any(kw in cleaned_input_for_kw for kw in MEDICAL_KEYWORDS)
+    if not has_medical_keyword:
+        explanation = (
+            f"Informasi mengenai klaim \"{text}\" belum tersedia atau belum memiliki bukti yang cukup di database rujukan kami, "
+            "sehingga sistem tidak dapat memberikan keputusan verifikasi."
+        )
+        summary = "Informasi tidak ditemukan atau bukti tidak cukup di database."
+        fakta = [
+            "Klaim tidak mengandung istilah medis yang dikenali di database kami.",
+            "Sistem menghindari pengambilan keputusan tanpa adanya bukti medis yang valid untuk mencegah misinformasi.",
+            "Konsultasikan dengan dokter atau tenaga medis profesional untuk memverifikasi kebenaran klaim ini secara klinis."
+        ]
+        sumber = ["Database Kebahasaan Lokal"]
+        return {"verdict": "TIDAK DAPAT DIVERIFIKASI", "confidence": 0.0, "summary": summary,
+                "penjelasan": explanation, "fakta": fakta, "sumber": sumber,
+                "word_count": word_count, "char_count": char_count, "input_text": text,
+                "model_info": "Sistem Verifikasi Fakta Medis (RAG Lokal)"}
+
+    mlp_model, mlp_vec = load_mlp_model()
+    if mlp_model and mlp_vec:
+        try:
+            cleaned_input = clean_text_fully(text, slang_dict)
+            words = cleaned_input.split()
+            cleaned_no_stopwords = " ".join([w for w in words if w not in STOPWORDS])
+            X = mlp_vec.transform([cleaned_no_stopwords]).toarray()
+            if X.sum() == 0:
                 explanation = (
                     f"Informasi mengenai klaim \"{text}\" belum tersedia atau belum memiliki bukti yang cukup di database rujukan kami, "
                     "sehingga sistem tidak dapat memberikan keputusan verifikasi."
                 )
                 summary = "Informasi tidak ditemukan atau bukti tidak cukup di database."
                 fakta = [
-                    "Tidak ditemukan referensi medis yang relevan untuk klaim ini di database kami.",
-                    "Sistem menghindari pengambilan keputusan verifikasi demi mencegah informasi yang berpotensi menyesatkan.",
+                    "Klaim tidak mengandung istilah medis yang dikenali di database kami.",
+                    "Sistem menghindari pengambilan keputusan tanpa adanya bukti medis yang valid untuk mencegah misinformasi.",
                     "Konsultasikan dengan dokter atau tenaga medis profesional untuk memverifikasi kebenaran klaim ini secara klinis."
                 ]
-                return {"verdict": "TIDAK DAPAT DIVERIFIKASI", "confidence": 0.0, "summary": summary,
-                        "penjelasan": explanation, "fakta": fakta, "sumber": ["Database Medis Lokal"],
-                        "word_count": word_count, "char_count": char_count, "input_text": text,
-                        "model_info": "Sistem Verifikasi Fakta Medis (RAG Lokal)"}
-                        
-        except Exception as e:
-            pass
-
-    # --- FALLBACK TO LOCAL PYTORCH MLP MODEL (Debiased Deep Learning) ---
-    mlp_model, mlp_vec = load_mlp_model()
-    if mlp_model and mlp_vec:
-        try:
-            cleaned_input = clean_text_fully(text, slang_dict)
-            X = mlp_vec.transform([cleaned_input]).toarray()
-            if X.sum() == 0:
-                explanation = (
-                    f"Klaim \"{text}\" belum dapat dipastikan kevalidannya oleh sistem kami "
-                    "karena tidak terdeteksi adanya kata kunci medis yang relevan dalam database rujukan kami."
-                )
-                summary = "Klaim belum dapat diidentifikasi karena tidak terdeteksi kata kunci rujukan."
-                fakta = [
-                    "Klaim tidak mengandung istilah medis yang dikenali di database kami.",
-                    "Sistem tidak dapat memproses informasi tanpa adanya kata kunci yang valid.",
-                    "Konsultasikan dengan dokter untuk memverifikasi kebenaran klaim ini secara klinis."
-                ]
                 sumber = ["Database Kebahasaan Lokal"]
-                classification = "BELUM TERDETEKSI"
+                classification = "TIDAK DAPAT DIVERIFIKASI"
                 return {"verdict": classification, "confidence": 0.0, "summary": summary,
                         "penjelasan": explanation, "fakta": fakta, "sumber": sumber,
                         "word_count": word_count, "char_count": char_count, "input_text": text,
@@ -394,21 +407,20 @@ def predict(text: str, threshold: float = 0.85) -> dict:
                 
             confidence = probabilities[prediction]
             
-            if confidence < 0.65:
+            if confidence < threshold:
                 explanation = (
-                    f"Klaim \"{text}\" belum dapat dipastikan kevalidannya oleh model analisis kami "
-                    f"karena tingkat keyakinan yang rendah yaitu sebesar {confidence*100:.2f}%. "
-                    "Informasi ini tidak ditemukan dalam pangkalan referensi medis resmi kami dan tidak terdeteksi sebagai hoaks yang tercatat."
+                    f"Informasi mengenai klaim \"{text}\" belum tersedia atau belum memiliki bukti yang cukup di database rujukan kami, "
+                    f"sehingga sistem tidak dapat memberikan keputusan verifikasi (tingkat keyakinan model: {confidence*100:.2f}% berada di bawah ambang batas {threshold*100:.2f}%)."
                 )
-                summary = "Klaim belum dapat diidentifikasi karena keterbatasan data rujukan."
+                summary = "Tingkat keyakinan model berada di bawah ambang batas."
                 fakta = [
-                    "Klaim tidak ditemukan dalam database rujukan resmi.",
-                    "Tingkat keyakinan model analisis berada di bawah ambang batas minimum 65%.",
-                    "Tidak ada bukti kuat untuk menyatakan informasi ini valid atau hoaks secara ilmiah.",
-                    "Konsultasikan dengan dokter untuk memverifikasi kebenaran medis dari klaim ini."
+                    "Referensi medis resmi tidak ditemukan di database rujukan untuk klaim ini.",
+                    f"Tingkat keyakinan model analisis ({confidence*100:.2f}%) berada di bawah ambang batas minimum yang ditentukan ({threshold*100:.2f}%).",
+                    "Sistem menghindari pengambilan keputusan untuk mencegah potensi informasi yang menyesatkan akibat keterbatasan data.",
+                    "Selalu konsultasikan informasi kesehatan langsung dengan dokter atau ahli medis."
                 ]
                 sumber = ["Database Medis Lokal"]
-                classification = "BELUM TERDETEKSI"
+                classification = "TIDAK DAPAT DIVERIFIKASI"
                 return {"verdict": classification, "confidence": float(confidence), "summary": summary,
                         "penjelasan": explanation, "fakta": fakta, "sumber": sumber,
                         "word_count": word_count, "char_count": char_count, "input_text": text,
@@ -470,21 +482,20 @@ def predict(text: str, threshold: float = 0.85) -> dict:
         prediction = torch.argmax(logits, dim=1).item()
     confidence = probabilities[prediction]
     
-    if confidence < 0.65:
+    if confidence < threshold:
         explanation = (
-            f"Klaim \"{text}\" belum dapat dipastikan kevalidannya oleh model analisis kami "
-            f"karena tingkat keyakinan yang rendah yaitu sebesar {confidence*100:.2f}%. "
-            "Informasi ini tidak ditemukan dalam pangkalan referensi medis resmi kami dan tidak terdeteksi sebagai hoaks yang tercatat."
+            f"Informasi mengenai klaim \"{text}\" belum tersedia atau belum memiliki bukti yang cukup di database rujukan kami, "
+            f"sehingga sistem tidak dapat memberikan keputusan verifikasi (tingkat keyakinan model: {confidence*100:.2f}% berada di bawah ambang batas {threshold*100:.2f}%)."
         )
-        summary = "Klaim belum dapat diidentifikasi karena keterbatasan data rujukan."
+        summary = "Tingkat keyakinan model berada di bawah ambang batas."
         fakta = [
-            "Klaim tidak ditemukan dalam database rujukan resmi.",
-            "Tingkat keyakinan model analisis berada di bawah ambang batas minimum 65%.",
-            "Tidak ada bukti kuat untuk menyatakan informasi ini valid atau hoaks secara ilmiah.",
-            "Konsultasikan dengan dokter untuk memverifikasi kebenaran medis dari klaim ini."
+            "Referensi medis resmi tidak ditemukan untuk mendukung klaim ini di database.",
+            f"Tingkat keyakinan model analisis ({confidence*100:.2f}%) berada di bawah ambang batas minimum yang ditentukan ({threshold*100:.2f}%).",
+            "Keputusan verifikasi tidak diberikan demi menghindari kesalahan klasifikasi akibat keterbatasan data.",
+            "Rujuklah kepada dokter atau institusi kesehatan resmi untuk memverifikasi klaim ini secara klinis."
         ]
         sumber = ["Database Medis Lokal"]
-        classification = "BELUM TERDETEKSI"
+        classification = "TIDAK DAPAT DIVERIFIKASI"
         return {"verdict": classification, "confidence": float(confidence), "summary": summary,
                 "penjelasan": explanation, "fakta": fakta, "sumber": sumber,
                 "word_count": word_count, "char_count": char_count, "input_text": text,
