@@ -22,11 +22,12 @@ async def get_index():
 
 class ClaimRequest(BaseModel):
     text: str
+    threshold: float = 0.85
 
 @app.post("/api/analyse")
 async def analyse_claim(req: ClaimRequest):
     t_start = time.time()
-    res = predict(req.text)
+    res = predict(req.text, threshold=req.threshold)
     t_end = time.time()
     
     # Format response fields

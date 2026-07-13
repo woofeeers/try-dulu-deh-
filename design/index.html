@@ -1006,10 +1006,13 @@
             const timerPromise = new Promise(resolve => setTimeout(resolve, 2000));
 
             // API fetch promise
+            const thresholdInput = document.getElementById('range-threshold');
+            const thresholdVal = thresholdInput ? (parseFloat(thresholdInput.value) / 100) : 0.85;
+
             const apiPromise = fetch('/api/analyse', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: claimText })
+                body: JSON.stringify({ text: claimText, threshold: thresholdVal })
             }).then(res => res.json());
 
             Promise.all([timerPromise, apiPromise])
@@ -1058,8 +1061,31 @@
                         </p>
                     </div>
                 `;
+            } else if (verdict === 'TIDAK DAPAT DIVERIFIKASI' || verdict === 'BELUM TERDETEKSI' || verdict === 'TIDAK PASTI') {
+                hoaxBox.classList.remove('hidden');
+                validBox.classList.add('hidden');
+                
+                let titleText = 'TIDAK DAPAT DIVERIFIKASI';
+                let accentColorClass = 'text-[#ffd28a]';
+                let borderColorClass = 'border-[#ffd28a]/30';
+                let bgContainerClass = 'bg-[#ffd28a]/15';
+                
+                const badge = hoaxBox.querySelector('.flex.justify-center > div');
+                badge.className = `${bgContainerClass} ${accentColorClass} border ${borderColorClass} px-10 py-4 rounded-full flex items-center gap-3 yellow-glow`;
+                badge.querySelector('span.font-display-lg').innerText = titleText;
+                badge.querySelector('span.material-symbols-outlined').innerText = 'help';
+
+                document.getElementById('hoax-explanation-container').innerHTML = `
+                    <p>${data.penjelasan}</p>
+                    <div class="pt-4 border-t border-white/10">
+                        <p class="font-accent-italic text-accent-italic text-[#ffd28a] border-l-2 border-[#ffd28a] pl-4">
+                            "Sistem tidak dapat memberikan keputusan klasifikasi tanpa bukti rujukan yang kuat untuk mencegah misinformasi."
+                            <span class="block mt-2 font-bold text-xs font-label-caps text-on-surface-variant uppercase tracking-wider">— Catatan Keselamatan Medis</span>
+                        </p>
+                    </div>
+                `;
             } else {
-                // HOAKS or TIDAK PASTI
+                // HOAKS or other
                 hoaxBox.classList.remove('hidden');
                 validBox.classList.add('hidden');
                 
@@ -1068,17 +1094,10 @@
                 let borderColorClass = 'border-error/30';
                 let bgContainerClass = 'bg-error-container/20';
                 
-                if (verdict === 'TIDAK PASTI') {
-                    titleText = `TIDAK PASTI (${Math.round(data.confidence * 100)}%)`;
-                    accentColorClass = 'text-[#ffd28a]';
-                    borderColorClass = 'border-[#ffd28a]/20';
-                    bgContainerClass = 'bg-[#ffd28a]/10';
-                }
-                
                 const badge = hoaxBox.querySelector('.flex.justify-center > div');
                 badge.className = `${bgContainerClass} ${accentColorClass} border ${borderColorClass} px-10 py-4 rounded-full flex items-center gap-3 animate-pulse coral-glow`;
                 badge.querySelector('span.font-display-lg').innerText = titleText;
-                badge.querySelector('span.material-symbols-outlined').innerText = verdict === 'TIDAK PASTI' ? 'help' : 'error';
+                badge.querySelector('span.material-symbols-outlined').innerText = 'error';
 
                 document.getElementById('hoax-explanation-container').innerHTML = `
                     <p>${data.penjelasan}</p>

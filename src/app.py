@@ -400,7 +400,7 @@ def page_eda():
 # ─────────────────────────────────────────────
 #  PAGE 3 - VERIFIKASI KLAIM KESEHATAN
 # ─────────────────────────────────────────────
-def page_prediction():
+def page_prediction(threshold=0.85):
     st.markdown('<h1 class="highlight-text">Verifikasi Klaim Kesehatan</h1>', unsafe_allow_html=True)
     st.markdown('<p style="color: #c3c5d9;">Periksa apakah tips, berita, atau pesan kesehatan yang Anda terima dari WhatsApp atau media sosial adalah fakta medis atau hoaks.</p>', unsafe_allow_html=True)
 
@@ -419,7 +419,7 @@ def page_prediction():
     if btn_clicked and user_input.strip():
         st.session_state.query = user_input.strip()
         with st.spinner("Mohon tunggu sebentar, sistem sedang membaca rujukan medis dari Kemenkes RI dan WHO..."):
-            st.session_state.result = predict(user_input.strip())
+            st.session_state.result = predict(user_input.strip(), threshold=threshold)
     elif btn_clicked and not user_input.strip():
         st.info("Tolong ketik atau tempel pesan kesehatan terlebih dahulu sebelum menekan tombol analisis.")
 
@@ -455,11 +455,11 @@ def page_prediction():
             </div>
             """
             panel_border = "rgba(255, 180, 171, 0.2)"
-        elif verdict == "BELUM TERDETEKSI":
+        elif verdict in ["TIDAK DAPAT DIVERIFIKASI", "BELUM TERDETEKSI", "TIDAK PASTI"]:
             badge_html = f"""
             <div style="display: flex; justify-content: center; margin-bottom: 24px;">
                 <div class="yellow-glow" style="background: rgba(255, 210, 138, 0.15); color: #ffd28a; border: 1px solid rgba(255, 210, 138, 0.3); padding: 12px 32px; border-radius: 9999px; font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
-                    BELUM BISA DIIDENTIFIKASI
+                    TIDAK DAPAT DIVERIFIKASI
                 </div>
             </div>
             """
@@ -468,7 +468,7 @@ def page_prediction():
             badge_html = f"""
             <div style="display: flex; justify-content: center; margin-bottom: 24px;">
                 <div class="yellow-glow" style="background: rgba(255, 210, 138, 0.15); color: #ffd28a; border: 1px solid rgba(255, 210, 138, 0.3); padding: 12px 32px; border-radius: 9999px; font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
-                    TIDAK PASTI
+                    TIDAK DAPAT DIVERIFIKASI
                 </div>
             </div>
             """
@@ -565,12 +565,23 @@ page = st.sidebar.radio(
     ["Halaman Utama", "Dashboard Analisis", "Cek Klaim", "Tentang Platform"]
 )
 
+st.sidebar.markdown('---')
+st.sidebar.markdown('<h3 style="color: #b7c4ff; font-size: 1.1rem; margin-top: 0; font-weight: 700; font-family: \'Plus Jakarta Sans\', sans-serif;">Konfigurasi AI</h3>', unsafe_allow_html=True)
+threshold = st.sidebar.slider(
+    "Ambang Batas Kepercayaan (Confidence Threshold)",
+    min_value=0.50,
+    max_value=1.00,
+    value=0.85,
+    step=0.05,
+    help="Ambang batas minimum untuk keyakinan model sebelum memberikan keputusan VALID atau HOAKS. Di bawah ambang batas ini akan berstatus 'Tidak Dapat Diverifikasi'."
+)
+
 if page == "Halaman Utama":
     page_home()
 elif page == "Dashboard Analisis":
     page_eda()
 elif page == "Cek Klaim":
-    page_prediction()
+    page_prediction(threshold=threshold)
 elif page == "Tentang Platform":
     page_about()
 
