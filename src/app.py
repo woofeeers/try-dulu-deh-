@@ -71,6 +71,9 @@ def inject_custom_css():
     .coral-glow {
         box-shadow: 0 0 25px rgba(255, 180, 171, 0.25) !important;
     }
+    .yellow-glow {
+        box-shadow: 0 0 25px rgba(255, 210, 138, 0.25) !important;
+    }
     
     .highlight-text {
         color: #b7c4ff !important;
@@ -452,11 +455,20 @@ def page_prediction():
             </div>
             """
             panel_border = "rgba(255, 180, 171, 0.2)"
+        elif verdict == "BELUM TERDETEKSI":
+            badge_html = f"""
+            <div style="display: flex; justify-content: center; margin-bottom: 24px;">
+                <div class="yellow-glow" style="background: rgba(255, 210, 138, 0.15); color: #ffd28a; border: 1px solid rgba(255, 210, 138, 0.3); padding: 12px 32px; border-radius: 9999px; font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+                    BELUM BISA DIIDENTIFIKASI
+                </div>
+            </div>
+            """
+            panel_border = "rgba(255, 210, 138, 0.2)"
         else:
             badge_html = f"""
             <div style="display: flex; justify-content: center; margin-bottom: 24px;">
-                <div style="background: rgba(255, 210, 138, 0.1); color: #ffd28a; border: 1px solid rgba(255, 210, 138, 0.2); padding: 12px 32px; border-radius: 9999px; font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
-                    TIDAK PASTI ({conf_pct}%)
+                <div class="yellow-glow" style="background: rgba(255, 210, 138, 0.15); color: #ffd28a; border: 1px solid rgba(255, 210, 138, 0.3); padding: 12px 32px; border-radius: 9999px; font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+                    TIDAK PASTI
                 </div>
             </div>
             """

@@ -334,6 +334,23 @@ def predict(text: str) -> dict:
         try:
             cleaned_input = clean_text_fully(text, slang_dict)
             X = mlp_vec.transform([cleaned_input]).toarray()
+            if X.sum() == 0:
+                explanation = (
+                    f"Klaim \"{text}\" belum dapat dipastikan kevalidannya oleh sistem kami "
+                    "karena tidak terdeteksi adanya kata kunci medis yang relevan dalam database rujukan kami."
+                )
+                summary = "Klaim belum dapat diidentifikasi karena tidak terdeteksi kata kunci rujukan."
+                fakta = [
+                    "Klaim tidak mengandung istilah medis yang dikenali di database kami.",
+                    "Sistem tidak dapat memproses informasi tanpa adanya kata kunci yang valid.",
+                    "Konsultasikan dengan dokter untuk memverifikasi kebenaran klaim ini secara klinis."
+                ]
+                sumber = ["Database Kebahasaan Lokal"]
+                classification = "BELUM TERDETEKSI"
+                return {"verdict": classification, "confidence": 0.0, "summary": summary,
+                        "penjelasan": explanation, "fakta": fakta, "sumber": sumber,
+                        "word_count": word_count, "char_count": char_count, "input_text": text,
+                        "model_info": "Neural Network MLP (Local Debiased Model)"}
             X_t = torch.tensor(X, dtype=torch.float32)
             with torch.no_grad():
                 logits = mlp_model(X_t)
@@ -341,8 +358,28 @@ def predict(text: str) -> dict:
                 prediction = torch.argmax(logits, dim=1).item()
                 
             confidence = probabilities[prediction]
-            classification = "HOAKS" if prediction == 0 else "VALID"
             
+            if confidence < 0.65:
+                explanation = (
+                    f"Klaim \"{text}\" belum dapat dipastikan kevalidannya oleh model analisis kami "
+                    f"karena tingkat keyakinan yang rendah yaitu sebesar {confidence*100:.2f}%. "
+                    "Informasi ini tidak ditemukan dalam pangkalan referensi medis resmi kami dan tidak terdeteksi sebagai hoaks yang tercatat."
+                )
+                summary = "Klaim belum dapat diidentifikasi karena keterbatasan data rujukan."
+                fakta = [
+                    "Klaim tidak ditemukan dalam database rujukan resmi.",
+                    "Tingkat keyakinan model analisis berada di bawah ambang batas minimum 65%.",
+                    "Tidak ada bukti kuat untuk menyatakan informasi ini valid atau hoaks secara ilmiah.",
+                    "Konsultasikan dengan dokter untuk memverifikasi kebenaran medis dari klaim ini."
+                ]
+                sumber = ["Database Medis Lokal"]
+                classification = "BELUM TERDETEKSI"
+                return {"verdict": classification, "confidence": float(confidence), "summary": summary,
+                        "penjelasan": explanation, "fakta": fakta, "sumber": sumber,
+                        "word_count": word_count, "char_count": char_count, "input_text": text,
+                        "model_info": "Neural Network MLP (Local Debiased Model)"}
+            
+            classification = "HOAKS" if prediction == 0 else "VALID"
             if prediction == 0:
                 explanation = (
                     f"Klaim \"{text}\" telah dianalisis oleh model Neural Network (MLP) dan terdeteksi sebagai **HOAKS** "
@@ -397,6 +434,27 @@ def predict(text: str) -> dict:
         probabilities = torch.softmax(logits, dim=1).flatten().tolist()
         prediction = torch.argmax(logits, dim=1).item()
     confidence = probabilities[prediction]
+    
+    if confidence < 0.65:
+        explanation = (
+            f"Klaim \"{text}\" belum dapat dipastikan kevalidannya oleh model analisis kami "
+            f"karena tingkat keyakinan yang rendah yaitu sebesar {confidence*100:.2f}%. "
+            "Informasi ini tidak ditemukan dalam pangkalan referensi medis resmi kami dan tidak terdeteksi sebagai hoaks yang tercatat."
+        )
+        summary = "Klaim belum dapat diidentifikasi karena keterbatasan data rujukan."
+        fakta = [
+            "Klaim tidak ditemukan dalam database rujukan resmi.",
+            "Tingkat keyakinan model analisis berada di bawah ambang batas minimum 65%.",
+            "Tidak ada bukti kuat untuk menyatakan informasi ini valid atau hoaks secara ilmiah.",
+            "Konsultasikan dengan dokter untuk memverifikasi kebenaran medis dari klaim ini."
+        ]
+        sumber = ["Database Medis Lokal"]
+        classification = "BELUM TERDETEKSI"
+        return {"verdict": classification, "confidence": float(confidence), "summary": summary,
+                "penjelasan": explanation, "fakta": fakta, "sumber": sumber,
+                "word_count": word_count, "char_count": char_count, "input_text": text,
+                "model_info": "IndoBERT Local (Fallback Mode)"}
+                
     classification = "HOAKS" if prediction == 0 else "VALID"
 
     if prediction == 0:
