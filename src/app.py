@@ -565,23 +565,12 @@ page = st.sidebar.radio(
     ["Halaman Utama", "Dashboard Analisis", "Cek Klaim", "Tentang Platform"]
 )
 
-st.sidebar.markdown('---')
-st.sidebar.markdown('<h3 style="color: #b7c4ff; font-size: 1.1rem; margin-top: 0; font-weight: 700; font-family: \'Plus Jakarta Sans\', sans-serif;">Konfigurasi AI</h3>', unsafe_allow_html=True)
-threshold = st.sidebar.slider(
-    "Ambang Batas Kepercayaan (Confidence Threshold)",
-    min_value=0.50,
-    max_value=1.00,
-    value=0.85,
-    step=0.05,
-    help="Ambang batas minimum untuk keyakinan model sebelum memberikan keputusan VALID atau HOAKS. Di bawah ambang batas ini akan berstatus 'Tidak Dapat Diverifikasi'."
-)
-
 if page == "Halaman Utama":
     page_home()
 elif page == "Dashboard Analisis":
     page_eda()
 elif page == "Cek Klaim":
-    page_prediction(threshold=threshold)
+    page_prediction()
 elif page == "Tentang Platform":
     page_about()
 
