@@ -166,12 +166,7 @@ def inject_custom_css():
 
     /* ── About Page: Section Divider ── */
     .about-divider {
-        width: 60px;
-        height: 3px;
-        background: linear-gradient(90deg, #b7c4ff, #00e0ff);
-        border-radius: 99px;
-        margin: 0 auto 20px auto;
-        border: none;
+        display: none !important;
     }
     .about-section-title {
         font-family: 'Plus Jakarta Sans', sans-serif !important;
@@ -409,6 +404,55 @@ def inject_custom_css():
     .badge-flash {
         animation: badgeGlowPulse 1.2s ease-out forwards;
     }
+
+    /* ── Top Navigation Bar Styles ── */
+    div[role="radiogroup"] > label > div:first-child {
+        display: none !important;
+    }
+    div[role="radiogroup"] {
+        gap: 32px !important;
+        justify-content: center;
+        align-items: center;
+    }
+    div[role="radiogroup"] > label {
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 600 !important;
+        font-size: 0.95rem !important;
+        color: #9da0b4 !important;
+        cursor: pointer;
+        padding: 4px 0 8px 0 !important;
+        transition: color 0.2s ease;
+        background: transparent !important;
+        border: none !important;
+    }
+    div[role="radiogroup"] > label:hover {
+        color: #ffffff !important;
+    }
+    div[role="radiogroup"] > label:has(input:checked) {
+        color: #00e0ff !important;
+        border-bottom: 2px solid #00e0ff !important;
+    }
+    div[role="radiogroup"] > label:has(input:checked) p {
+        color: #00e0ff !important;
+    }
+    div[role="radiogroup"] > label > div[data-testid="stMarkdownContainer"] > p {
+        font-size: 0.95rem !important;
+        margin: 0 !important;
+    }
+    /* Adjust Streamlit block spacing for nav */
+    div[data-testid="stRadio"] {
+        margin-bottom: 0 !important;
+    }
+
+    /* ── Page Transition Animation ── */
+    @keyframes pageFadeIn {
+        from { opacity: 0; transform: translateY(12px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .main .block-container {
+        animation: pageFadeIn 0.5s ease-out forwards;
+    }
+
     </style>
     """, unsafe_allow_html=True)
 
@@ -619,25 +663,18 @@ def page_eda():
     </div>
     """, unsafe_allow_html=True)
 
-    # ── Kesimpulan ──
-    st.markdown("""
-    <div class="about-centered" style="margin-top: 40px;">
-        <hr class="about-divider">
-    </div>
-    <div class="about-story-card" style="border-color: rgba(0, 224, 255, 0.3) !important;">
-        <h4 style="color: #00e0ff; font-family: 'Plus Jakarta Sans', sans-serif; margin-top: 0; margin-bottom: 12px;">Rahasia Kecerdasan Sistem Kami</h4>
-        <p style="text-align: center;">
-            Kelemahan sistem komputer biasa adalah mereka akan langsung mengira semua tulisan pendek sebagai hoaks. Untuk mengatasi kelemahan ini, sistem kami tidak hanya melihat panjang tulisan, tetapi juga <strong>membaca langsung isi pesan Anda</strong> dan mencocokkan maknanya dengan buku panduan resmi dari dokter dan kementerian kesehatan sebelum memberikan hasil verifikasi.
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+
 
 # ─────────────────────────────────────────────
 #  PAGE 3 - VERIFIKASI KLAIM KESEHATAN
 # ─────────────────────────────────────────────
 def page_prediction(threshold=0.85):
-    st.markdown('<h1 class="highlight-text">Verifikasi Klaim Kesehatan</h1>', unsafe_allow_html=True)
-    st.markdown('<p style="color: #c3c5d9;">Periksa apakah tips, berita, atau pesan kesehatan yang Anda terima dari WhatsApp atau media sosial adalah fakta medis atau hoaks.</p>', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="about-centered" style="margin-bottom: 32px; padding-top: 8px;">
+        <h1 class="about-hero-title">Verifikasi Klaim Kesehatan</h1>
+        <p class="about-hero-sub">Periksa apakah tips, berita, atau pesan kesehatan yang Anda terima dari WhatsApp atau media sosial adalah fakta medis atau hoaks.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
     user_input = st.text_area(
         label="Tempel Pesan Kesehatan di Sini",
@@ -745,19 +782,18 @@ def page_prediction(threshold=0.85):
 def page_about():
     # ── Hero Section ──
     st.markdown("""
-    <div class="about-centered" style="margin-bottom: 48px; padding-top: 8px;">
+    <div class="about-centered" style="margin-bottom: 48px; padding-top: 8px; position: relative; z-index: 2;">
         <h1 class="about-hero-title">Tentang CekKlaim.id</h1>
     </div>
     """, unsafe_allow_html=True)
 
     # ── Story Card: Mengapa Kami Membuat CekKlaim.id ──
     st.markdown("""
-    <div class="about-centered">
-        <hr class="about-divider">
+    <div class="about-centered" style="position: relative; z-index: 2;">
         <h2 class="about-section-title">Mengapa Kami Membuat CekKlaim.id?</h2>
         <p class="about-section-subtitle">Latar belakang yang menggerakkan kami</p>
     </div>
-    <div class="about-story-card">
+    <div class="about-story-card" style="position: relative; z-index: 2;">
         <p>
             Ide pembuatan CekKlaim.id bermula dari kekhawatiran sehari-hari. Kami sering melihat orang tua, kerabat, hingga teman dekat membagikan tips kesehatan yang menyesatkan di grup WhatsApp keluarga — seperti meminum cairan mentah berbahaya atau menghindari obat resep dokter. Misinformasi kesehatan seperti ini bukan sekadar berita bohong biasa, melainkan ancaman nyata bagi keselamatan jiwa. Dari situlah kami tergerak untuk melahirkan CekKlaim.id sebagai wadah verifikasi informasi medis yang andal namun sangat mudah dipahami oleh siapa saja.
         </p>
@@ -766,12 +802,11 @@ def page_about():
 
     # ── Cara Kerja: 4 Step Cards Grid ──
     st.markdown("""
-    <div class="about-centered" style="margin-top: 40px;">
-        <hr class="about-divider">
+    <div class="about-centered" style="margin-top: 40px; position: relative; z-index: 2;">
         <h2 class="about-section-title">Cara Kerja Sistem Kami</h2>
         <p class="about-section-subtitle">Empat tahapan cerdas untuk memverifikasi kebenaran klaim kesehatan</p>
     </div>
-    <div class="steps-grid">
+    <div class="steps-grid" style="position: relative; z-index: 2;">
         <div class="step-card">
             <div class="step-num step-num-1">1</div>
             <h4>Normalisasi Bahasa</h4>
@@ -797,12 +832,11 @@ def page_about():
 
     # ── Teknologi yang Digunakan ──
     st.markdown("""
-    <div class="about-centered" style="margin-top: 40px;">
-        <hr class="about-divider">
+    <div class="about-centered" style="margin-top: 40px; position: relative; z-index: 2;">
         <h2 class="about-section-title">Teknologi yang Kami Gunakan</h2>
         <p class="about-section-subtitle">Stack teknologi di balik mesin verifikasi kami</p>
     </div>
-    <div class="tech-badges-wrap">
+    <div class="tech-badges-wrap" style="position: relative; z-index: 2;">
         <span class="tech-badge">Python</span>
         <span class="tech-badge">Streamlit</span>
         <span class="tech-badge">TF-IDF Vectorizer</span>
@@ -816,12 +850,11 @@ def page_about():
 
     # ── Tim Kami ──
     st.markdown("""
-    <div class="about-centered" style="margin-top: 40px;">
-        <hr class="about-divider">
+    <div class="about-centered" style="margin-top: 40px; position: relative; z-index: 2;">
         <h2 class="about-section-title">Tim Kami</h2>
         <p class="about-section-subtitle">Orang-orang di balik CekKlaim.id</p>
     </div>
-    <div class="team-grid">
+    <div class="team-grid" style="position: relative; z-index: 2;">
         <div class="team-card">
             <div class="team-avatar team-avatar-1">L</div>
             <div class="team-name">Laula</div>
@@ -837,10 +870,7 @@ def page_about():
 
     # ── Quote / Misi ──
     st.markdown("""
-    <div class="about-centered" style="margin-top: 40px;">
-        <hr class="about-divider">
-    </div>
-    <div class="about-quote">
+    <div class="about-quote" style="position: relative; z-index: 2;">
         <p>
             Di tengah badai lebih dari 1.500 berita bohong kesehatan yang meracuni nalar publik, CekKlaim.id hadir sebagai lentera penunjuk kebenaran medis — agar tidak ada lagi nyawa dan keluarga yang menjadi korban misinformasi.
         </p>
@@ -851,12 +881,22 @@ def page_about():
 # ─────────────────────────────────────────────
 #  NAVIGATION & MAIN
 # ─────────────────────────────────────────────
-st.sidebar.markdown('<h2 style="color: #b7c4ff; font-size: 1.5rem; margin-top: 0; margin-bottom: 24px; font-weight: 800; font-family: \'Plus Jakarta Sans\', sans-serif;">CekKlaim.id</h2>', unsafe_allow_html=True)
+st.markdown('<style>section[data-testid="stSidebar"] {display: none !important;}</style>', unsafe_allow_html=True)
 
-page = st.sidebar.radio(
-    "Navigasi Aplikasi",
-    ["Halaman Utama", "Dashboard Analisis", "Cek Klaim", "Tentang Platform"]
-)
+nav_col1, nav_col2 = st.columns([1, 4], vertical_alignment="center")
+
+with nav_col1:
+    st.markdown('<div style="font-family: \'Plus Jakarta Sans\', sans-serif; font-size: 1.6rem; font-weight: 800; color: #00e0ff; margin-bottom: 8px;">CekKlaim.id</div>', unsafe_allow_html=True)
+
+with nav_col2:
+    page = st.radio(
+        "Navigasi Aplikasi",
+        ["Halaman Utama", "Dashboard Analisis", "Cek Klaim", "Tentang Platform"],
+        horizontal=True,
+        label_visibility="collapsed"
+    )
+
+st.markdown('<hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 0; margin-bottom: 40px;">', unsafe_allow_html=True)
 
 if page == "Halaman Utama":
     page_home()
